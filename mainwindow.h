@@ -113,6 +113,7 @@ class MainWindow:public QMainWindow
 public:
     MainWindow();
     QActionGroup *styleGroup;
+    QActionGroup *languageGroup;
     Highlighter *highlighter;
     mr_statusBar *status;
     StyleCreatorDialog *styleDialog;
@@ -171,7 +172,9 @@ public slots:
     void updateModificationTime();
     void updateStatusBar();
     void upplyCheckedTheme();
-
+    void setKeywordsCXX2020();
+    void setKeywordsCXX2011();
+    void setKeywordsC2018();
 };
 //![extraarea]
 
