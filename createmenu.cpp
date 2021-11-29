@@ -146,7 +146,7 @@ void MainWindow::createMenu()
 
    editMenu->addMenu(styleMenu);
 
-    //Languages switch menu for viewMenu
+//Start of Languages switch menu for viewMenu
     QMenu *languageMenu = new QMenu{"Available languages"};
     languageGroup = new QActionGroup(this);
 
@@ -171,6 +171,11 @@ void MainWindow::createMenu()
     languageMenu->addAction(languageAct_C2018);
 
     viewMenu->addMenu(languageMenu);
+//End of creating language Menu
+
+    QAction *loadThemeAct = new QAction("Load new theme", this);
+    connect(loadThemeAct, &QAction::triggered, this, &MainWindow::openNewTheme);
+    viewMenu->addAction(loadThemeAct);
 
    //connect(mr_Editor, &QPlainTextEdit::cursorPositionChanged, this, &MainWindow::updateStatusBar);
    connect(mr_Editor, &QPlainTextEdit::cursorPositionChanged, status, &mr_statusBar::updateRowColumn);

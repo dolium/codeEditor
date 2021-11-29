@@ -23,7 +23,6 @@
 #include <QDir>
 #include <QSettings>
 #include "findDialog.h"
-
 #include "highlighter.h"
 #include "stylecreatordialog.h"
 #include "styleswitchdialog.h"
@@ -147,13 +146,13 @@ public:
     QVector<QString> themesPathsReally;
     void createMenu();
     void setCurrentFileName(const QString &fileName);
-    void createNewTheme(QString name = "Theme_1", QColor syntaxColor = Qt::magenta, QColor commentColor = Qt::darkCyan, QColor literalColor = Qt::darkRed, QColor functionColor = Qt::red, QColor backgroundColor = Qt::gray, QColor textColor = Qt::black);
+    void createNewTheme(QString name = "Theme_1", QColor syntaxColor = Qt::magenta, QColor commentColor = Qt::darkCyan, QColor literalColor = Qt::darkRed, QColor functionColor = Qt::red, QColor backgroundColor = Qt::gray, QColor textColor = Qt::white);
     void setThemeSettings(QString themePath);
     void initializeThemes();
     void findThemes();
     void deleteThemes(QVector<QString> paths);
 public slots:
-    void newFile(){}
+    void newFile();
     void open();
     bool save();
     bool saveAs();
@@ -175,6 +174,7 @@ public slots:
     void setKeywordsCXX2020();
     void setKeywordsCXX2011();
     void setKeywordsC2018();
+    void openNewTheme();
 };
 //![extraarea]
 

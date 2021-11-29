@@ -99,6 +99,15 @@ void MainWindow::setThemeSettings(QString themePath)
     mr_Editor->backgroundColor = backgroundColor;
     mr_Editor->setTextColor(theme->value("textColor").value<QColor>());
     mr_Editor->updateTextColor();
+    QFileInfo info{themePath};
+    //If we do not have this theme - add it to themes list;
+    if (!themesPaths.contains(themePath) and (info.baseName()!=QString("default")))
+    {
+
+        themesPaths.append(info.baseName());
+        themesPaths.append(info.absoluteFilePath());
+        availableThemes->setValue("themesPaths", QVariant(themesPaths));
+    }
     updateTheme();
 }
 
@@ -142,6 +151,11 @@ void MainWindow::deleteThemes(QVector<QString> paths)
         availableThemes->setValue("themesPaths", QVariant(themesPaths));
     }
 
+}
+
+void MainWindow::newFile()
+{
+    saveAs();
 }
 
 
@@ -229,7 +243,6 @@ void MainWindow::updateModificationTime()
          statusBar()->addWidget(rowColumnLabel);
      }
 
-    lastModificationTime->setVisible(true);
 }
 Editor::Editor(QWidget *parent) : QPlainTextEdit(parent)
 {
@@ -586,6 +599,15 @@ void MainWindow::setKeywordsC2018()
     delete highlighter;
     highlighter = new Highlighter(this->mr_Editor->document(), syntaxColor, commentColor, literalColor, functionColor, Highlighter::C2018);
 }
+
+void MainWindow::openNewTheme()
+{
+    QString newThemePath = QFileDialog::getOpenFileName(this,
+           tr("Select theme"), "",
+           tr("Theme ini-file (*.ini);;All Files (*)"));
+    setThemeSettings(newThemePath);
+
+}
 bool MainWindow::save()
 {
     QString fileName = currentFilePath;
@@ -638,6 +660,8 @@ bool MainWindow::saveAs()
         tr("C++ code (*.cpp *.h *.cxx *.hpp);;All Files (*)"));
     QFileInfo fi{fileName};
     currentFilePath = fileName;
+    setCurrentFileName(fi.fileName());
+
     if (fileName.isEmpty())
         return false;
     else
