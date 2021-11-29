@@ -25,9 +25,7 @@ public:
     Highlighter(QTextDocument *parent = nullptr, QColor syntaxColor=Qt::darkBlue, QColor commentColor = Qt::cyan, QColor literalColor = Qt::magenta, QColor functionColor = Qt::yellow, keywordsSyntax keywordsType = keywordsSyntax::CXX20);
     QColor syntaxColor;
     void setSyntaxColor(QColor newColor);
-    void setKeywordPatterns11(){keywords = keywordPatterns11;}
-    void setKeywordPatterns20(){keywords = keywordPatterns20;}
-    void setKeywordPatterns_C2018(){keywords = keywordPatterns_C2018;}
+
 
 protected:
     void highlightBlock(const QString &text) override;
@@ -55,6 +53,9 @@ private:
     QVector<QString> keywordPatterns20;
     QVector<QString> keywordPatterns_C2018;
     QVector <QString> keywords;
+    void setKeywordPatterns11(){keywords = keywordPatterns11;}
+    void setKeywordPatterns20(){keywords = keywordPatterns20;}
+    void setKeywordPatterns_C2018(){keywords = keywordPatterns_C2018;}
 };
 //! [0]
 

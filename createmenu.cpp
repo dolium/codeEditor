@@ -134,6 +134,7 @@ void MainWindow::createMenu()
    {
        QAction *themeAct = new QAction("set "+themesNames[i]+" style", this);
        themeAct->setCheckable(true);
+       if (i==1) themeAct->setChecked(true);
        stylesButtons.append(themeAct);
        styleGroup->addAction(themeAct);
        connect(themeAct, &QAction::triggered, this, &MainWindow::upplyCheckedTheme);
@@ -142,11 +143,37 @@ void MainWindow::createMenu()
    {
        styleMenu->addAction(stylesButtons[i]);
    }
+
    editMenu->addMenu(styleMenu);
 
+    //Languages switch menu for viewMenu
+    QMenu *languageMenu = new QMenu{"Available languages"};
+    languageGroup = new QActionGroup(this);
 
+    QAction *languageAct_CXX2020 = new QAction("set C++ 2020 syntax", this);
+    languageAct_CXX2020->setCheckable(true);
+    //It is Defaut syntax:
+    languageAct_CXX2020->setChecked(true);
+    connect(languageAct_CXX2020, &QAction::triggered, this, &MainWindow::setKeywordsCXX2020);
+    languageGroup->addAction(languageAct_CXX2020);
+    languageMenu->addAction(languageAct_CXX2020);
+
+    QAction *languageAct_CXX2011 = new QAction("set C++ 2011 syntax", this);
+    languageAct_CXX2011->setCheckable(true);
+    connect(languageAct_CXX2011, &QAction::triggered, this, &MainWindow::setKeywordsCXX2011);
+    languageGroup->addAction(languageAct_CXX2011);
+    languageMenu->addAction(languageAct_CXX2011);
+
+    QAction *languageAct_C2018 = new QAction("set C 2018 syntax", this);
+    languageAct_C2018->setCheckable(true);
+    connect(languageAct_C2018, &QAction::triggered, this, &MainWindow::setKeywordsC2018);
+    languageGroup->addAction(languageAct_C2018);
+    languageMenu->addAction(languageAct_C2018);
+
+    viewMenu->addMenu(languageMenu);
 
    //connect(mr_Editor, &QPlainTextEdit::cursorPositionChanged, this, &MainWindow::updateStatusBar);
    connect(mr_Editor, &QPlainTextEdit::cursorPositionChanged, status, &mr_statusBar::updateRowColumn);
    connect(mr_Editor, &QPlainTextEdit::cursorPositionChanged, status, &mr_statusBar::updateCountInfo);
+
 }

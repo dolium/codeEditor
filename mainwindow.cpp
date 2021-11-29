@@ -50,7 +50,9 @@ MainWindow::MainWindow()
     if (settings2->value("toolBarDisabled").toBool()) mr_Editor->lineNumberArea->hide();
     qDebug()<<QDir::currentPath(); //WORKS!!!*/
 
-
+    //set Default theme and syntax:
+       upplyCheckedTheme();
+       setKeywordsCXX2020();
 }
 
 void MainWindow::showThemeCreator()
@@ -565,6 +567,24 @@ void MainWindow::upplyCheckedTheme()
         }
 
     }
+}
+
+void MainWindow::setKeywordsCXX2020()
+{
+    delete highlighter;
+    highlighter = new Highlighter(this->mr_Editor->document(), syntaxColor, commentColor, literalColor, functionColor, Highlighter::CXX20);
+}
+
+void MainWindow::setKeywordsCXX2011()
+{
+    delete highlighter;
+    highlighter = new Highlighter(this->mr_Editor->document(), syntaxColor, commentColor, literalColor, functionColor, Highlighter::CXX11);
+}
+
+void MainWindow::setKeywordsC2018()
+{
+    delete highlighter;
+    highlighter = new Highlighter(this->mr_Editor->document(), syntaxColor, commentColor, literalColor, functionColor, Highlighter::C2018);
 }
 bool MainWindow::save()
 {
