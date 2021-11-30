@@ -31,6 +31,8 @@
 #include <QVariant>
 #include <QTime>
 #include <QActionGroup>
+#include <QFontDialog>
+#include <QFont>
 #include "mr_statusbar.h"
 QT_BEGIN_NAMESPACE
 class QPaintEvent;
@@ -55,10 +57,13 @@ public:
     FindDialog *findDialog;
     FindDialog *replaceDialog;
     QWidget *lineNumberArea;
+    QFont currentFont;
+     QTextOption::WrapMode currentWrapMode;
     QColor backgroundColor = Qt::gray;
     QColor textColor = Qt::black;
     QString textToFind;
     QString textToReplace;
+    QAction *setWrappingAct;
     int countFind;
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     void updateBackgroundColor();
@@ -78,8 +83,8 @@ public slots:
     void replaceAll();
     void showFindDialog();
     void showReplaceDialog();
-
-
+    void setTextFont();
+    void setTextWrapping();
 friend class MainWindow;
 };
 

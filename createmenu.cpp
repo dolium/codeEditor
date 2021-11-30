@@ -177,6 +177,18 @@ void MainWindow::createMenu()
     connect(loadThemeAct, &QAction::triggered, this, &MainWindow::openNewTheme);
     viewMenu->addAction(loadThemeAct);
 
+    QMenu* formatMenu = menuBar()->addMenu(tr("Format"));
+
+    QAction *applyNewFontAct = new QAction ("Set new font", this);
+    connect(applyNewFontAct, &QAction::triggered, mr_Editor, &Editor::setTextFont);
+    formatMenu->addAction(applyNewFontAct);
+
+    mr_Editor->setWrappingAct = new QAction("Enable width-wrapping", this);
+    mr_Editor->setWrappingAct->setCheckable(true);
+    connect(mr_Editor->setWrappingAct, &QAction::triggered, mr_Editor, &Editor::setTextWrapping);
+    formatMenu->addAction(mr_Editor->setWrappingAct);
+
+
    //connect(mr_Editor, &QPlainTextEdit::cursorPositionChanged, this, &MainWindow::updateStatusBar);
    connect(mr_Editor, &QPlainTextEdit::cursorPositionChanged, status, &mr_statusBar::updateRowColumn);
    connect(mr_Editor, &QPlainTextEdit::cursorPositionChanged, status, &mr_statusBar::updateCountInfo);

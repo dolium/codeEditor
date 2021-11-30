@@ -12,7 +12,6 @@ MainWindow::MainWindow()
 
 
     mr_Editor = new Editor{};
-    mr_Editor->setWindowTitle(QObject::tr("Code Editor Example"));
     setCentralWidget(mr_Editor);
 
 
@@ -246,6 +245,9 @@ void MainWindow::updateModificationTime()
 }
 Editor::Editor(QWidget *parent) : QPlainTextEdit(parent)
 {
+    setWindowTitle(QObject::tr("Editor"));
+    setWordWrapMode(QTextOption::NoWrap);
+    currentWrapMode = QTextOption::WrapMode::NoWrap;
     lineNumberArea = new LineNumberArea(this);
 
     //Font
@@ -380,7 +382,24 @@ void Editor::showReplaceDialog()
     replaceDialog->show();
 }
 
+void Editor::setTextFont()
+{
+    this->setFont(QFontDialog::getFont(0, this->font()));
+    currentFont = this->font();
+}
 
+void Editor::setTextWrapping()
+{
+    currentWrapMode = QTextOption::NoWrap;
+    setWordWrapMode(QTextOption::NoWrap);
+    if (setWrappingAct->isChecked())
+    {
+        setLineWrapMode(QPlainTextEdit::LineWrapMode::WidgetWidth);
+        currentWrapMode =  QTextOption::WordWrap;
+        setWordWrapMode(QTextOption::WordWrap);
+    }
+
+}
 void Editor::replace()
 {
     if (!this->textCursor().hasSelection())
