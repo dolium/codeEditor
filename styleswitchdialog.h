@@ -32,6 +32,7 @@ public:
     void updateTheme();
     void updateBackgroundColor();
     void updateTextColor();
+    void showPossibleChanges();
     QVector<QPushButton *>deleteButtons;
     QVector<QString>themesToDelete;
 private:
@@ -40,14 +41,26 @@ private:
     QVector<QString> names;
     QVector<QString> paths;
     QVector<QRadioButton *>radioButtons;
+    QVector<QLabel*> labels;
+    QVector<QPushButton*> pickButton;
     QPushButton *acceptButton;
+    QPushButton *acceptChanges;
     void createGridGroupBox();
     void createPathAndNames(QVector<QString>);
     QString currentPath;
     QString currentName;
+    QColorDialog *colorDialog;
+    QSettings* theme;
+
 public slots:
     void setCurrentData();
     void addThemesToDelete();
-
+    void pickSyntaxColor();
+    void pickCommentColor();
+    void pickLiteralColor();
+    void pickFunctionColor();
+    void pickBackgroundColor();
+    void pickTextColor();
+    void reformTheme();
 };
 #endif // STYLESWITCHDIALOG_H

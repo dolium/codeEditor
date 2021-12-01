@@ -5,6 +5,8 @@
 StyleSwitchDialog::StyleSwitchDialog(QWidget *parent, QVector<QString> pathAndNames):QDialog{parent}
 {
 
+    colorDialog = new QColorDialog(parent);
+
     createPathAndNames(pathAndNames);
     acceptButton = new QPushButton(tr("&Accept"));
 
@@ -20,6 +22,20 @@ StyleSwitchDialog::StyleSwitchDialog(QWidget *parent, QVector<QString> pathAndNa
     connect(acceptButton, &QPushButton::clicked, this, &StyleSwitchDialog::addThemesToDelete);
     smallEditor->setPlainText("do {i--} while(i>0) foo() 'literal' and simple text //Comment");
     setLayout(layout);
+    connect(pickButton[0], &QPushButton::clicked, this, &StyleSwitchDialog::pickSyntaxColor);
+
+    connect(pickButton[1], &QPushButton::clicked, this, &StyleSwitchDialog::pickCommentColor);
+
+    connect(pickButton[2], &QPushButton::clicked, this, &StyleSwitchDialog::pickLiteralColor);
+
+    connect(pickButton[3], &QPushButton::clicked, this, &StyleSwitchDialog::pickFunctionColor);
+
+    connect(pickButton[4], &QPushButton::clicked, this, &StyleSwitchDialog::pickBackgroundColor);
+
+    connect(pickButton[5],  &QPushButton::clicked, this, &StyleSwitchDialog::pickTextColor);
+    connect(acceptChanges, &QPushButton::clicked, this, &StyleSwitchDialog::reformTheme);
+    //960*430 set size
+    resize(760, 320);
 }
 
 
@@ -38,21 +54,36 @@ void StyleSwitchDialog::createGridGroupBox()
         QPushButton *deleteButton = new QPushButton{this};
         deleteButtons.append(deleteButton);
         deleteButtons[i]->setCheckable(true);
-        QString deleteString = QString{"Delete style"};
+        QString deleteString = QString{"Delete"};
         deleteButtons[i]->setText(deleteString);
 
         layout->addWidget(radioButtons[i], i, 0);
         layout->addWidget(deleteButtons[i], i,1);
     }
 
+    QString buttonName{"Pick color"};
+    QVector<QString> labelsNames{"Keyword's color", "Comment's color", "Literals color", "Function color", "Background color", "Text color", "Style name"};
+    for (int i = 0; i < 6; ++i)
+    {
+        labels.push_back(new QLabel(labelsNames[i]));
+        pickButton.push_back(new QPushButton{this});
+        pickButton[i]->setText(buttonName);
+
+        layout->addWidget(labels[i], i, 2);
+        layout->addWidget(pickButton[i], i, 3);
+    }
+    acceptChanges = new QPushButton("Accept changes");
     smallEditor = new QPlainTextEdit(this);
-    smallEditor->setPlainText(tr("This widget takes up about two thirds of the "
-                                 "grid layout."));
+    smallEditor->setPlainText(tr("do {i--} while(i>0) foo() 'literal' and simple text //Comment"));
     highlighter = new Highlighter(smallEditor->document());
-    layout->addWidget(smallEditor, 0, 2, 3, 1);
-    layout->setColumnStretch(0, 10);
+    layout->addWidget(smallEditor, 0, 4, 4, 1);
+    layout->addWidget(acceptChanges, 0, 5);
+    layout->setColumnStretch(0, 4);
     layout->setColumnStretch(1, 3);
-    layout->setColumnStretch(2, 30);
+    layout->setColumnStretch(2, 5);
+    layout->setColumnStretch(3, 5);
+    layout->setColumnStretch(4, 30);
+    layout->setColumnStretch(5, 5);
     gridGroupBox->setLayout(layout);
 }
 
@@ -74,7 +105,7 @@ void StyleSwitchDialog::createPathAndNames(QVector<QString>pathAndNames)
 void StyleSwitchDialog::setThemeSettings(QString themePath)
 {
 
-    QSettings* theme = new QSettings(themePath, QSettings::IniFormat);
+    theme = new QSettings(themePath, QSettings::IniFormat);
     syntaxColor     = theme->value("syntaxColor").value<QColor>();
     commentColor    = theme->value("commentColor").value<QColor>();
     literalColor    = theme->value("literalColor").value<QColor>();
@@ -111,6 +142,13 @@ void StyleSwitchDialog::updateTextColor()
     smallEditor->setPalette(palette);
 }
 
+void StyleSwitchDialog::showPossibleChanges()
+{
+    updateTheme();
+    updateBackgroundColor();
+    updateTextColor();
+}
+
 
 void StyleSwitchDialog::setCurrentData()
 {
@@ -135,4 +173,54 @@ void StyleSwitchDialog::addThemesToDelete()
              themesToDelete.append(paths[i]);
         }
     }
+}
+
+void StyleSwitchDialog::pickSyntaxColor()
+{
+    syntaxColor = colorDialog->getColor();
+    showPossibleChanges();
+}
+
+
+void StyleSwitchDialog::pickCommentColor()
+{
+    commentColor = colorDialog->getColor();
+    showPossibleChanges();
+}
+
+
+void StyleSwitchDialog::pickLiteralColor()
+{
+    literalColor = colorDialog->getColor();
+    showPossibleChanges();
+}
+
+
+void StyleSwitchDialog::pickFunctionColor()
+{
+    functionColor = colorDialog->getColor();
+    showPossibleChanges();
+}
+
+
+void StyleSwitchDialog::pickBackgroundColor()
+{
+    backgroundColor = colorDialog->getColor();
+    showPossibleChanges();
+}
+
+void StyleSwitchDialog::pickTextColor()
+{
+    textColor = colorDialog->getColor();
+    showPossibleChanges();
+}
+
+void StyleSwitchDialog::reformTheme()
+{
+    theme->setValue("syntaxColor", QVariant(syntaxColor));
+    theme->setValue("commentColor", QVariant(commentColor));
+    theme->setValue("literalColor", QVariant(literalColor));
+    theme->setValue("functionColor", QVariant(functionColor));
+    theme->setValue("backgroundColor", QVariant(backgroundColor));
+    theme->setValue("textColor", QVariant(textColor));
 }

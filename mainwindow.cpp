@@ -10,7 +10,7 @@
 MainWindow::MainWindow()
 {
 
-
+    if (QFile::exists(QDir::currentPath() + "/settings/"+"currentSettings.ini")) currentSettings = new QSettings(QDir::currentPath() + "/settings/"+"currentSettings.ini", QSettings::IniFormat);
     mr_Editor = new Editor{};
     setCentralWidget(mr_Editor);
 
@@ -23,17 +23,17 @@ MainWindow::MainWindow()
 
     status = new mr_statusBar{this, mr_Editor};
     statusBar()->addWidget(status);
-
-    createMenu();
     syntaxColor = Qt::darkBlue;
     highlighter =  new Highlighter(mr_Editor->document(), syntaxColor);
+    createMenu();
+
     colorPicker = new QColorDialog({0,1,1}, this);
     connect(mr_Editor->document(), &QTextDocument::contentsChanged,
             this, &MainWindow::documentWasModified);
     setUnifiedTitleAndToolBarOnMac(true);
     setCurrentFileName("untitled.cpp");
 
-    applyCheckedTheme();
+
     setKeywordsCXX2020();
 
     if (QFile::exists(QDir::currentPath() + "/settings/"+"currentSettings.ini"))
@@ -45,6 +45,7 @@ MainWindow::MainWindow()
     {
         initSettings();
     }
+ //applyCheckedTheme();
 }
 
 void MainWindow::showThemeCreator()
@@ -87,6 +88,8 @@ void MainWindow::setThemeSettings(QString themePath)
     QString isTheme = curTheme->value("isTheme").value<QString>();
     if (isTheme==QString{"itIsReallyTheme"})
     {
+
+
 
         QSettings* theme = new QSettings(themePath, QSettings::IniFormat);
         currentThemePath = themePath;
@@ -179,6 +182,7 @@ void MainWindow::applySettings()
         enableStatusBar();
     }
     setThemeSettings(currentSettings->value("currentThemePath").toString());
+
     //FONT
     QFont ff;
     ff.fromString(currentSettings->value("currentFontFamily").toString());
@@ -670,7 +674,6 @@ void MainWindow::open()
     //updateModificationTime();
 
     status->updateModificationTime();
-    qDebug()<<currentFilePath;
     status->updateSizeInfo(currentFilePath);
     setWindowModified(false);
 }
@@ -689,6 +692,7 @@ void MainWindow::applyCheckedTheme()
     {
         if (stylesButtons[i]->isChecked())
         {
+            currentSettings->setValue("currentThemePath", QVariant(themesPathsReally[i]));
             setThemeSettings(themesPathsReally[i]);
         }
 
@@ -760,7 +764,6 @@ bool MainWindow::save()
     //statusBar()->showMessage(tr("File saved successfully!"));
     //updateModificationTime();
     status->updateModificationTime();
-    qDebug()<<currentFilePath;
     status->updateSizeInfo(currentFilePath);
     setWindowModified(false);
     return true;

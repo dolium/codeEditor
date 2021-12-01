@@ -134,18 +134,30 @@ void MainWindow::createMenu()
    {
        QAction *themeAct = new QAction("set "+themesNames[i]+" style", this);
        themeAct->setCheckable(true);
-       if (i==1) themeAct->setChecked(true);
+
+       if (currentSettings->contains("currentThemePath")and currentSettings->value("currentThemePath").toString()!="")
+       {
+
+            QFileInfo tempThemeInfo{currentSettings->value("currentThemePath").toString()};
+            QString tempThemeName = tempThemeInfo.baseName();
+            if (themesNames[i]==tempThemeName) themeAct->setChecked(true);
+       }
+       else
+       {
+            if (i==0) themeAct->setChecked(true);
+       }
        stylesButtons.append(themeAct);
        styleGroup->addAction(themeAct);
        connect(themeAct, &QAction::triggered, this, &MainWindow::applyCheckedTheme);
    }
+
    for (int i = 0 ; i < themesNames.length(); ++i)
    {
        styleMenu->addAction(stylesButtons[i]);
    }
 
    editMenu->addMenu(styleMenu);
-
+    applyCheckedTheme();
 //Start of Languages switch menu for viewMenu
     QMenu *languageMenu = new QMenu{"Available languages"};
     languageGroup = new QActionGroup(this);
