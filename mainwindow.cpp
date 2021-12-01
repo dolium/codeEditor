@@ -18,10 +18,8 @@ MainWindow::MainWindow()
     currentBackgroundColor = mr_Editor->backgroundColor;
     backgroundColor = mr_Editor->backgroundColor;
     currentBlockColor = QColor(currentBackgroundColor).lighter(130);
-//Replace next code with initializeThemes()
-    availableThemes = new QSettings(QDir::currentPath()+QString{"/themes2.ini"}, QSettings::IniFormat);
-    themesPaths = availableThemes->value("themesPaths").value<QVector<QString>>();
-    findThemes();
+
+    initializeThemes();
 
     status = new mr_statusBar{this, mr_Editor};
     statusBar()->addWidget(status);
@@ -35,23 +33,18 @@ MainWindow::MainWindow()
     setUnifiedTitleAndToolBarOnMac(true);
     setCurrentFileName("untitled.cpp");
 
+    applyCheckedTheme();
+    setKeywordsCXX2020();
 
+    if (QFile::exists(QDir::currentPath() + "/settings/"+"currentSettings.ini"))
+    {
+        applySettings();
+    }
 
-
-
-
-    /*current_settings = new QSettings(QDir::currentPath() + "/current_style.ini", QSettings::IniFormat);
-    current_settings->setValue("size", QVariant(size()));
-    current_settings->setValue("toolBarDisabled", QVariant(true));
-    current_settings->sync();
-    QSettings* settings2 = new QSettings(QDir::currentPath() + "/my_config_file.ini", QSettings::IniFormat);
-
-    if (settings2->value("toolBarDisabled").toBool()) mr_Editor->lineNumberArea->hide();
-    qDebug()<<QDir::currentPath(); //WORKS!!!*/
-
-    //set Default theme and syntax:
-       upplyCheckedTheme();
-       setKeywordsCXX2020();
+    else
+    {
+        initSettings();
+    }
 }
 
 void MainWindow::showThemeCreator()
@@ -89,25 +82,35 @@ void MainWindow::showStyleSwitch()
 void MainWindow::setThemeSettings(QString themePath)
 {
 
-    QSettings* theme = new QSettings(themePath, QSettings::IniFormat);
-    syntaxColor = theme->value("syntaxColor").value<QColor>();
-    commentColor = theme->value("commentColor").value<QColor>();
-    literalColor = theme->value("literalColor").value<QColor>();
-    functionColor = theme->value("functionColor").value<QColor>();
-    backgroundColor = theme->value("backgroundColor").value<QColor>();
-    mr_Editor->backgroundColor = backgroundColor;
-    mr_Editor->setTextColor(theme->value("textColor").value<QColor>());
-    mr_Editor->updateTextColor();
-    QFileInfo info{themePath};
-    //If we do not have this theme - add it to themes list;
-    if (!themesPaths.contains(themePath) and (info.baseName()!=QString("default")))
+    QSettings* curTheme = new QSettings(themePath, QSettings::IniFormat);
+
+    QString isTheme = curTheme->value("isTheme").value<QString>();
+    if (isTheme==QString{"itIsReallyTheme"})
     {
 
-        themesPaths.append(info.baseName());
-        themesPaths.append(info.absoluteFilePath());
-        availableThemes->setValue("themesPaths", QVariant(themesPaths));
+        QSettings* theme = new QSettings(themePath, QSettings::IniFormat);
+        currentThemePath = themePath;
+        syntaxColor = theme->value("syntaxColor").value<QColor>();
+        commentColor = theme->value("commentColor").value<QColor>();
+        literalColor = theme->value("literalColor").value<QColor>();
+        functionColor = theme->value("functionColor").value<QColor>();
+        backgroundColor = theme->value("backgroundColor").value<QColor>();
+        mr_Editor->backgroundColor = backgroundColor;
+        mr_Editor->setTextColor(theme->value("textColor").value<QColor>());
+        mr_Editor->updateTextColor();
+        QFileInfo info{themePath};
+        //If we do not have this theme - add it to themes list;
+
+
+        if (!themesPaths.contains(themePath) and (info.baseName()!=QString("default")))
+        {
+
+            themesPaths.append(info.baseName());
+            themesPaths.append(info.absoluteFilePath());
+            availableThemes->setValue("themesPaths", QVariant(themesPaths));
+        }
+        updateTheme();
     }
-    updateTheme();
 }
 
 void MainWindow::initializeThemes()
@@ -152,6 +155,61 @@ void MainWindow::deleteThemes(QVector<QString> paths)
 
 }
 
+void MainWindow::applySettings()
+{
+    currentSettings = new QSettings(QDir::currentPath() + "/settings/"+"currentSettings.ini", QSettings::IniFormat);
+    if (!currentSettings->value("toolBarEnabled").toBool())
+    {
+        hideToolBar->setChecked(false);
+        enableToolBar();
+    }
+    if (!currentSettings->value("numberBarEnabled").toBool())
+    {
+        hideNumBar->setChecked(false);
+        enableNumBar();
+    }
+    if (currentSettings->value("wordWrappingEnabled").toBool())
+    {
+        setWrappingAct->setChecked(true);
+        setTextWrapping();
+    }
+    if (!currentSettings->value("statusBarEnabled").toBool())
+    {
+        hideStatusBar->setChecked(false);
+        enableStatusBar();
+    }
+    setThemeSettings(currentSettings->value("currentThemePath").toString());
+    //FONT
+    QFont ff;
+    ff.fromString(currentSettings->value("currentFontFamily").toString());
+    ff.setStyleHint(QFont::Monospace);
+    ff.setFixedPitch(true);
+    mr_Editor->setFont(ff);
+    const int tabStop = 4;  // 4 characters
+
+    QFontMetrics metrics(ff);
+    mr_Editor->setTabStopDistance(tabStop * metrics.maxWidth());
+
+    mr_Editor->currentFont = ff;
+
+     mr_Editor->setFont(ff);
+
+     //End of font
+}
+
+void MainWindow::initSettings()
+{
+    QString path = QDir::currentPath() + "/settings/"+"currentSettings.ini";
+    currentSettings = new QSettings(path, QSettings::IniFormat);
+    currentSettings->setValue("toolBarEnabled", QVariant(true));
+    currentSettings->setValue("numberBarEnabled", QVariant(true));
+    currentSettings->setValue("wordWrappingEnabled", QVariant(true));
+    currentSettings->setValue("statusBarEnabled", QVariant(true));
+    currentSettings->setValue("currentThemePath", QVariant(currentThemePath));
+    currentSettings->setValue("currentFontFamily", QVariant(mr_Editor->currentFont.toString()));
+    currentSettings->sync();
+}
+
 void MainWindow::newFile()
 {
     saveAs();
@@ -168,16 +226,19 @@ void MainWindow::createNewTheme(QString name, QColor _syntaxColor, QColor _comme
     themesPaths.append(name);
     themesPaths.append(path);
     availableThemes->setValue("themesPaths", QVariant(themesPaths));
-    current_settings = new QSettings(path, QSettings::IniFormat);
-    current_settings->setValue("name", QVariant(name));
-    current_settings->setValue("syntaxColor", QVariant(_syntaxColor));
-    current_settings->setValue("commentColor", QVariant(_commentColor));
-    current_settings->setValue("literalColor", QVariant(_literalColor));
-    current_settings->setValue("functionColor", QVariant(_functionColor));
-    current_settings->setValue("backgroundColor", QVariant(_backgroundColor));
-    current_settings->setValue("textColor", QVariant(_textColor));
-    current_settings->setValue("isTheme", QVariant("itIsReallyTheme"));
-    current_settings->sync();
+    currentThemeSettings = new QSettings(path, QSettings::IniFormat);
+    currentThemeSettings->setValue("name", QVariant(name));
+    currentThemeSettings->setValue("syntaxColor", QVariant(_syntaxColor));
+    currentThemeSettings->setValue("commentColor", QVariant(_commentColor));
+    currentThemeSettings->setValue("literalColor", QVariant(_literalColor));
+    currentThemeSettings->setValue("functionColor", QVariant(_functionColor));
+    currentThemeSettings->setValue("backgroundColor", QVariant(_backgroundColor));
+    currentThemeSettings->setValue("textColor", QVariant(_textColor));
+    currentThemeSettings->setValue("isTheme", QVariant("itIsReallyTheme"));
+
+    currentThemeSettings->sync();
+    currentSettings->setValue("currentThemePath", QVariant(path));
+    currentSettings->sync();
 
 
     //Side effect - set this style
@@ -202,6 +263,8 @@ void MainWindow::updateTheme()
     currentBackgroundColor = backgroundColor;
     mr_Editor->updateBackgroundColor();
     mr_Editor->updateTextColor();
+
+
 }
 
 void MainWindow::updateRowColumn()
@@ -251,16 +314,8 @@ Editor::Editor(QWidget *parent) : QPlainTextEdit(parent)
     lineNumberArea = new LineNumberArea(this);
 
     //Font
-    QFont font;
-    font.setFamily("Courier");
-    font.setStyleHint(QFont::Monospace);
-    font.setFixedPitch(true);
-    font.setPointSize(10);
-    setFont(font);
-    const int tabStop = 4;  // 4 characters
 
-    QFontMetrics metrics(font);
-    setTabStopDistance(tabStop * metrics.maxWidth());
+
 
 
     updateBackgroundColor();
@@ -287,13 +342,20 @@ void MainWindow::enableNumBar()
         mr_Editor->lineNumberArea->setVisible(false);
         mr_Editor->setViewportMargins(0, 0, 0, 0);
         disconnect(mr_Editor, &Editor::blockCountChanged, mr_Editor, &Editor::updateLineNumberAreaWidth);
+        currentSettings->setValue("numberBarEnabled", QVariant(false));
+        currentSettings->sync();
     }
     else if(hideNumBar->isChecked()==true)
     {
         mr_Editor->lineNumberArea->setVisible(true);
         mr_Editor->setViewportMargins(25, 0, 0, 0);
         connect(mr_Editor, &Editor::blockCountChanged, mr_Editor, &Editor::updateLineNumberAreaWidth);
+        currentSettings->setValue("numberBarEnabled", QVariant(true));
+        currentSettings->sync();
+
     }
+
+
 
 }
 
@@ -382,21 +444,32 @@ void Editor::showReplaceDialog()
     replaceDialog->show();
 }
 
-void Editor::setTextFont()
+void MainWindow::setTextFont()
 {
-    this->setFont(QFontDialog::getFont(0, this->font()));
-    currentFont = this->font();
+    mr_Editor->setFont(QFontDialog::getFont(0, mr_Editor->font()));
+    mr_Editor->currentFont = mr_Editor->font();
+    currentSettings->setValue("currentFontFamily", QVariant(mr_Editor->currentFont.toString()));
+    currentSettings->sync();
+
 }
 
-void Editor::setTextWrapping()
+void MainWindow::setTextWrapping()
 {
-    currentWrapMode = QTextOption::NoWrap;
-    setWordWrapMode(QTextOption::NoWrap);
+    mr_Editor->currentWrapMode = QTextOption::NoWrap;
+    mr_Editor->setWordWrapMode(QTextOption::NoWrap);
     if (setWrappingAct->isChecked())
     {
-        setLineWrapMode(QPlainTextEdit::LineWrapMode::WidgetWidth);
-        currentWrapMode =  QTextOption::WordWrap;
-        setWordWrapMode(QTextOption::WordWrap);
+        mr_Editor->setLineWrapMode(QPlainTextEdit::LineWrapMode::WidgetWidth);
+        mr_Editor->currentWrapMode =  QTextOption::WordWrap;
+        mr_Editor->setWordWrapMode(QTextOption::WordWrap);
+        currentSettings->setValue("wordWrappingEnabled", QVariant(true));
+        currentSettings->sync();
+
+
+    }
+    else
+    {
+        currentSettings->setValue("wordWrappingEnabled", QVariant(false));         currentSettings->sync();
     }
 
 }
@@ -443,10 +516,20 @@ void MainWindow::changeBlockColor()
 void MainWindow::enableToolBar()
 {
     if (hideToolBar->isChecked())
+    {
         fileToolBar->setVisible(true);
+        currentSettings->setValue("toolBarEnabled", QVariant(true));
+        currentSettings->sync();
+
+    }
+
     else
     {
         fileToolBar->setVisible(false);
+        currentSettings->setValue("toolBarEnabled", QVariant(false));
+        currentSettings->sync();
+
+
     }
 }
 
@@ -454,9 +537,20 @@ void MainWindow::enableToolBar()
 void MainWindow::enableStatusBar()
 {
     if (hideStatusBar->isChecked())
+    {
         statusBar()->setVisible(true);
+        currentSettings->setValue("statusBarEnabled", true);
+        currentSettings->sync();
+
+    }
     else
+    {
         statusBar()->setVisible(false);
+        currentSettings->setValue("statusBarEnabled", false);
+        currentSettings->sync();
+
+
+    }
 }
 
 void Editor::updateBackgroundColor()
@@ -589,7 +683,7 @@ void MainWindow::updateStatusBar()
 
 }
 
-void MainWindow::upplyCheckedTheme()
+void MainWindow::applyCheckedTheme()
 {
     for (int i = 0; i < themesNames.length(); ++i)
     {

@@ -63,7 +63,7 @@ public:
     QColor textColor = Qt::black;
     QString textToFind;
     QString textToReplace;
-    QAction *setWrappingAct;
+
     int countFind;
     void lineNumberAreaPaintEvent(QPaintEvent *event);
     void updateBackgroundColor();
@@ -83,8 +83,7 @@ public slots:
     void replaceAll();
     void showFindDialog();
     void showReplaceDialog();
-    void setTextFont();
-    void setTextWrapping();
+
 friend class MainWindow;
 };
 
@@ -127,10 +126,12 @@ public:
     QAction *hideNumBar;
     QAction *hideToolBar;
     QAction *hideStatusBar;
+    QAction *setWrappingAct;
     QColorDialog* colorPicker;
     QString currentFileName;
-    QSettings* current_settings;
+    QSettings* currentThemeSettings;
     QSettings* availableThemes;
+    QSettings* currentSettings;
     QColor currentBackgroundColor;
     QColor currentBlockColor;
     QString styleName;
@@ -156,6 +157,8 @@ public:
     void initializeThemes();
     void findThemes();
     void deleteThemes(QVector<QString> paths);
+    void applySettings();
+    void initSettings();
 public slots:
     void newFile();
     void open();
@@ -175,11 +178,13 @@ public slots:
     void updateRowColumn();
     void updateModificationTime();
     void updateStatusBar();
-    void upplyCheckedTheme();
+    void applyCheckedTheme();
     void setKeywordsCXX2020();
     void setKeywordsCXX2011();
     void setKeywordsC2018();
     void openNewTheme();
+    void setTextFont();
+    void setTextWrapping();
 };
 //![extraarea]
 

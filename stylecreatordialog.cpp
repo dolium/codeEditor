@@ -94,7 +94,7 @@ void StyleCreatorDialog::createGridGroupBox()
         layout->addWidget(pickButton[i], i, 1);
     }
 
-//! [9] //! [10]
+
     smallEditor = new QTextEdit;
     smallEditor->setPlainText("do {i--} while(i>0) foo() 'literal' and simple text //Comment");
 

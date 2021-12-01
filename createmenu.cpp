@@ -137,7 +137,7 @@ void MainWindow::createMenu()
        if (i==1) themeAct->setChecked(true);
        stylesButtons.append(themeAct);
        styleGroup->addAction(themeAct);
-       connect(themeAct, &QAction::triggered, this, &MainWindow::upplyCheckedTheme);
+       connect(themeAct, &QAction::triggered, this, &MainWindow::applyCheckedTheme);
    }
    for (int i = 0 ; i < themesNames.length(); ++i)
    {
@@ -180,17 +180,17 @@ void MainWindow::createMenu()
     QMenu* formatMenu = menuBar()->addMenu(tr("Format"));
 
     QAction *applyNewFontAct = new QAction ("Set new font", this);
-    connect(applyNewFontAct, &QAction::triggered, mr_Editor, &Editor::setTextFont);
+    connect(applyNewFontAct, &QAction::triggered, this, &MainWindow::setTextFont);
     formatMenu->addAction(applyNewFontAct);
-
-    mr_Editor->setWrappingAct = new QAction("Enable width-wrapping", this);
-    mr_Editor->setWrappingAct->setCheckable(true);
-    connect(mr_Editor->setWrappingAct, &QAction::triggered, mr_Editor, &Editor::setTextWrapping);
-    formatMenu->addAction(mr_Editor->setWrappingAct);
+    setWrappingAct = new QAction("Enable width-wrapping", this);
+    setWrappingAct->setCheckable(true);
+    connect(setWrappingAct, &QAction::triggered, this, &MainWindow::setTextWrapping);
+    formatMenu->addAction(setWrappingAct);
 
 
    //connect(mr_Editor, &QPlainTextEdit::cursorPositionChanged, this, &MainWindow::updateStatusBar);
    connect(mr_Editor, &QPlainTextEdit::cursorPositionChanged, status, &mr_statusBar::updateRowColumn);
    connect(mr_Editor, &QPlainTextEdit::cursorPositionChanged, status, &mr_statusBar::updateCountInfo);
+
 
 }
