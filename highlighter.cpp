@@ -4,6 +4,7 @@
 Highlighter::Highlighter(QTextDocument *parent, QColor syntaxColor, QColor commentColor, QColor literalColor, QColor functionColor, keywordsSyntax syntaxType)
     : QSyntaxHighlighter(parent)
 {
+    enabled = true;
     this->syntaxColor = syntaxColor;
     HighlightingRule rule;
 
@@ -59,6 +60,7 @@ void Highlighter::setSyntaxColor(QColor newColor) //Maybe just create new object
 
 void Highlighter::highlightBlock(const QString &text)
 {
+    if(enabled == false){return;}
     for (const HighlightingRule &rule : qAsConst(highlightingRules))
     {
         QRegularExpressionMatchIterator matchIterator = rule.pattern.globalMatch(text);

@@ -199,10 +199,15 @@ void MainWindow::createMenu()
     connect(setWrappingAct, &QAction::triggered, this, &MainWindow::setTextWrapping);
     formatMenu->addAction(setWrappingAct);
 
+    hideHighlightingAct = new QAction("Enable highlighting", this);
+    hideHighlightingAct->setCheckable(true);
+    hideHighlightingAct->setChecked(true);
+    connect(hideHighlightingAct, &QAction::triggered, this, &MainWindow::enableHighlighting);
+    viewMenu->addAction(hideHighlightingAct);
+
 
    //connect(mr_Editor, &QPlainTextEdit::cursorPositionChanged, this, &MainWindow::updateStatusBar);
-   connect(mr_Editor, &QPlainTextEdit::cursorPositionChanged, status, &mr_statusBar::updateRowColumn);
-   connect(mr_Editor, &QPlainTextEdit::cursorPositionChanged, status, &mr_statusBar::updateCountInfo);
+
 
 
 }

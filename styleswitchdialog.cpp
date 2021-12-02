@@ -34,7 +34,6 @@ StyleSwitchDialog::StyleSwitchDialog(QWidget *parent, QVector<QString> pathAndNa
 
     connect(pickButton[5],  &QPushButton::clicked, this, &StyleSwitchDialog::pickTextColor);
     connect(acceptChanges, &QPushButton::clicked, this, &StyleSwitchDialog::reformTheme);
-    //960*430 set size
     resize(760, 320);
 }
 

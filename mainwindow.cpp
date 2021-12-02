@@ -21,11 +21,10 @@ MainWindow::MainWindow()
 
     initializeThemes();
 
-    status = new mr_statusBar{this, mr_Editor};
-    statusBar()->addWidget(status);
+
     syntaxColor = Qt::darkBlue;
     highlighter =  new Highlighter(mr_Editor->document(), syntaxColor);
-    createMenu();
+    createMenu(); //Very sensitive to its position
 
     colorPicker = new QColorDialog({0,1,1}, this);
     connect(mr_Editor->document(), &QTextDocument::contentsChanged,
@@ -45,7 +44,11 @@ MainWindow::MainWindow()
     {
         initSettings();
     }
- //applyCheckedTheme();
+    status = new mr_statusBar{this, mr_Editor};
+    statusBar()->addWidget(status);
+    connect(mr_Editor, &QPlainTextEdit::cursorPositionChanged, status, &mr_statusBar::updateRowColumn);
+    connect(mr_Editor, &QPlainTextEdit::cursorPositionChanged, status, &mr_statusBar::updateCountInfo);
+
 }
 
 void MainWindow::showThemeCreator()
@@ -281,6 +284,7 @@ void MainWindow::updateRowColumn()
     }
 
     rowColumnPosition = "Row/column position: "+QString::number(mr_Editor->textCursor().blockNumber())+" | " + QString::number(mr_Editor->textCursor().positionInBlock());
+
     rowColumnLabel = new QLabel(rowColumnPosition, this);
     statusBar()->clearMessage();
 
@@ -290,7 +294,6 @@ void MainWindow::updateRowColumn()
         statusBar()->addWidget(lastModificationTime);
         statusBar()->addWidget(rowColumnLabel);
     }
-
 }
 
 void MainWindow::updateModificationTime()
@@ -341,8 +344,6 @@ void MainWindow::enableNumBar()
 {
     if (!hideNumBar->isChecked())
     {
-
-
         mr_Editor->lineNumberArea->setVisible(false);
         mr_Editor->setViewportMargins(0, 0, 0, 0);
         disconnect(mr_Editor, &Editor::blockCountChanged, mr_Editor, &Editor::updateLineNumberAreaWidth);
@@ -359,8 +360,20 @@ void MainWindow::enableNumBar()
 
     }
 
+}
 
-
+void MainWindow::enableHighlighting()
+{
+    if (!hideHighlightingAct->isChecked())
+    {
+        highlighter->enabled = false;
+        mr_Editor->setPlainText(mr_Editor->document()->toPlainText());
+    }
+    else
+    {
+        highlighter->enabled = true;
+        mr_Editor->setPlainText(mr_Editor->document()->toPlainText());
+    }
 }
 
 
@@ -611,22 +624,22 @@ void Editor::highlightCurrentLine()
 void Editor::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
     QPainter painter(lineNumberArea);
-    painter.fillRect(event->rect(), Qt::lightGray);
+    painter.fillRect(event->rect(), backgroundColor.lighter(75));
 
-//![extraAreaPaintEvent_0]
 
-//![extraAreaPaintEvent_1]
     QTextBlock block = firstVisibleBlock();
     int blockNumber = block.blockNumber();
     int top = qRound(blockBoundingGeometry(block).translated(contentOffset()).top());
     int bottom = top + qRound(blockBoundingRect(block).height());
-//![extraAreaPaintEvent_1]
-
-//![extraAreaPaintEvent_2]
-    while (block.isValid() && top <= event->rect().bottom()) {
-        if (block.isVisible() && bottom >= event->rect().top()) {
+    int newR = 255 - backgroundColor.lighter(75).red();
+    int newG = 255- backgroundColor.lighter(75).green();
+    int newB = 255 - backgroundColor.lighter(75).blue();
+    while (block.isValid() && top <= event->rect().bottom())
+    {
+        if (block.isVisible() && bottom >= event->rect().top())
+        {
             QString number = QString::number(blockNumber + 1);
-            painter.setPen(Qt::black);
+            painter.setPen(QColor(newR,newG,newB));
             painter.drawText(0, top, lineNumberArea->width(), fontMetrics().height(),
                              Qt::AlignRight, number);
         }

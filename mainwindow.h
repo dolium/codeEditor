@@ -58,7 +58,7 @@ public:
     FindDialog *replaceDialog;
     QWidget *lineNumberArea;
     QFont currentFont;
-     QTextOption::WrapMode currentWrapMode;
+    QTextOption::WrapMode currentWrapMode;
     QColor backgroundColor = Qt::gray;
     QColor textColor = Qt::black;
     QString textToFind;
@@ -127,6 +127,7 @@ public:
     QAction *hideToolBar;
     QAction *hideStatusBar;
     QAction *setWrappingAct;
+    QAction *hideHighlightingAct;
     QColorDialog* colorPicker;
     QString currentFileName;
     QSettings* currentThemeSettings;
@@ -172,6 +173,7 @@ public slots:
     void enableToolBar();
     void enableStatusBar();
     void enableNumBar();
+    void enableHighlighting();
     void showThemeCreator();
     void showStyleSwitch();
     void updateTheme();

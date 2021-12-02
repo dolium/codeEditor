@@ -25,7 +25,7 @@ public:
     Highlighter(QTextDocument *parent = nullptr, QColor syntaxColor=Qt::darkBlue, QColor commentColor = Qt::cyan, QColor literalColor = Qt::magenta, QColor functionColor = Qt::yellow, keywordsSyntax keywordsType = keywordsSyntax::CXX20);
     QColor syntaxColor;
     void setSyntaxColor(QColor newColor);
-
+    bool enabled;
 
 protected:
     void highlightBlock(const QString &text) override;
