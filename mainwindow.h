@@ -34,6 +34,7 @@
 #include <QFontDialog>
 #include <QFont>
 #include "mr_statusbar.h"
+#include "aboutdialog.h"
 QT_BEGIN_NAMESPACE
 class QPaintEvent;
 class QResizeEvent;
@@ -53,6 +54,8 @@ class Editor : public QPlainTextEdit
     Q_OBJECT
 
 public:
+    void contextMenuEvent(QContextMenuEvent *event) override;
+
     Editor(QWidget *parent = nullptr);
     FindDialog *findDialog;
     FindDialog *replaceDialog;
@@ -83,7 +86,8 @@ public slots:
     void replaceAll();
     void showFindDialog();
     void showReplaceDialog();
-
+    void selectLine();
+    void selectWord();
 friend class MainWindow;
 };
 
@@ -137,7 +141,7 @@ public:
     QColor currentBlockColor;
     QString styleName;
     QVector<QAction*> stylesButtons;
-    QVector<QString> themesPaths; //Vector of pairs name of style : path to this style
+    QVector<QString> themesPaths; //Vector of pairs name of style : path to this style. They go sequentially.
     QString currentThemeName;
     QString currentThemePath;
     QString currentFilePath;
@@ -187,6 +191,8 @@ public slots:
     void openNewTheme();
     void setTextFont();
     void setTextWrapping();
+    void showAboutDialog();
+
 };
 //![extraarea]
 

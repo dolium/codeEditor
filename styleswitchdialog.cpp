@@ -73,7 +73,7 @@ void StyleSwitchDialog::createGridGroupBox()
     }
     acceptChanges = new QPushButton("Accept changes");
     smallEditor = new QPlainTextEdit(this);
-    smallEditor->setPlainText(tr("do {i--} while(i>0) foo() 'literal' and simple text //Comment"));
+    smallEditor->setPlainText(tr("do {i--} while(i>0) void foo() and simple text //Comment"));
     highlighter = new Highlighter(smallEditor->document());
     layout->addWidget(smallEditor, 0, 4, 4, 1);
     layout->addWidget(acceptChanges, 0, 5);

@@ -490,6 +490,24 @@ void MainWindow::setTextWrapping()
     }
 
 }
+
+void MainWindow::showAboutDialog()
+{
+    aboutDialog *dialog = new aboutDialog{this};
+    dialog->show();
+}
+
+void Editor::selectLine()
+{
+    moveCursor(QTextCursor::StartOfLine);
+    moveCursor(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
+}
+
+void Editor::selectWord()
+{
+    moveCursor(QTextCursor::StartOfWord);
+    moveCursor(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
+}
 void Editor::replace()
 {
     if (!this->textCursor().hasSelection())
@@ -868,4 +886,21 @@ void MainWindow::setCurrentFileName(const QString &fileName)
     if (currentFileName.isEmpty())
         shownName = "untitled.cpp";
     setWindowFilePath(shownName);
+}
+
+
+void Editor::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu *menu = createStandardContextMenu();
+
+
+    QAction *selectLineAct = new QAction(tr("&Select line"), this);
+    connect(selectLineAct, &QAction::triggered, this, &Editor::selectLine);
+    menu->addAction(selectLineAct);
+
+    QAction *selectWordAct = new QAction(tr("&Select word"), this);
+    connect(selectWordAct, &QAction::triggered, this, &Editor::selectWord);
+    menu->addAction(selectWordAct);
+
+    menu->exec(event->globalPos());
 }

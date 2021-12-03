@@ -33,41 +33,73 @@ StyleCreatorDialog::StyleCreatorDialog(QWidget *parent):QDialog(parent)
 
 }
 
+void StyleCreatorDialog::updateTheme()
+{
 
+  delete highlighter;
+  highlighter = new Highlighter(smallEditor->document(), syntaxColor, commentColor, literalColor, functionColor);
+
+}
+
+void StyleCreatorDialog::updateTextColor()
+{
+    QPalette palette = smallEditor->palette();
+    palette.setColor(QPalette::Text, textColor);
+    smallEditor->setPalette(palette);
+}
+
+void StyleCreatorDialog::updateBackgroundColor()
+{
+    QPalette palette;
+    palette.setColor(QPalette::Base, backgroundColor);
+    smallEditor->setPalette(palette);
+}
+void StyleCreatorDialog::showPossibleChanges()
+{
+    updateTheme();
+    updateBackgroundColor();
+    updateTextColor();
+}
 
 
 void StyleCreatorDialog::pickSyntaxColor()
 {
     syntaxColor = colorDialog->getColor();
+    showPossibleChanges();
 }
 
 
 void StyleCreatorDialog::pickCommentColor()
 {
     commentColor = colorDialog->getColor();
+     showPossibleChanges();
 }
 
 
 void StyleCreatorDialog::pickLiteralColor()
 {
     literalColor = colorDialog->getColor();
+     showPossibleChanges();
 }
 
 
 void StyleCreatorDialog::pickFunctionColor()
 {
     functionColor = colorDialog->getColor();
+     showPossibleChanges();
 }
 
 
 void StyleCreatorDialog::pickBackgroundColor()
 {
     backgroundColor = colorDialog->getColor();
+     showPossibleChanges();
 }
 
 void StyleCreatorDialog::pickTextColor()
 {
     textColor = colorDialog->getColor();
+     showPossibleChanges();
 }
 
 void StyleCreatorDialog::setStyleName()
@@ -96,7 +128,7 @@ void StyleCreatorDialog::createGridGroupBox()
 
 
     smallEditor = new QTextEdit;
-    smallEditor->setPlainText("do {i--} while(i>0) foo() 'literal' and simple text //Comment");
+    smallEditor->setPlainText("do {i--} while(i>0) foo() and simple text //Comment");
 
     layout->addWidget(smallEditor, 0, 2, 3, 1);
     styleNameEdit = new QLineEdit("unnamed");
@@ -107,5 +139,7 @@ void StyleCreatorDialog::createGridGroupBox()
 
     layout->setColumnStretch(1, 10);
     layout->setColumnStretch(2, 30);
+    highlighter = new Highlighter(smallEditor->document());
     gridGroupBox->setLayout(layout);
+
 }

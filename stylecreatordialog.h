@@ -9,7 +9,7 @@
 #include <QColorDialog>
 #include <QGroupBox>
 #include <QTextEdit>
-
+#include "highlighter.h"
 
 class StyleCreatorDialog : public QDialog
 {
@@ -31,10 +31,13 @@ private:
     QVector<QPushButton *>pickButton;
     QPushButton *acceptButton;
     void createGridGroupBox();
-
+    void showPossibleChanges();
+    void updateTheme();
+    void updateTextColor();
+    void updateBackgroundColor();
     QLabel* justLabel;
     QLineEdit *styleNameEdit;
-
+    Highlighter* highlighter;
     QColor syntaxColor = Qt::magenta;
     QColor commentColor = Qt::darkCyan;
     QColor literalColor = Qt::blue;
