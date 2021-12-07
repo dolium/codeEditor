@@ -9,8 +9,7 @@ Highlighter::Highlighter(QTextDocument *parent, QColor syntaxColor, QColor comme
     HighlightingRule rule;
 
     keywordFormat.setForeground(syntaxColor);
-    //keywordFormat.setFont()
-    setKeywords();
+    setKeywordData();
     if (syntaxType == keywordsSyntax::CXX20) setKeywordPatterns20();
     if (syntaxType == keywordsSyntax::CXX11) setKeywordPatterns11();
     if (syntaxType == keywordsSyntax::C2018) setKeywordPatterns_C2018();
@@ -36,22 +35,20 @@ Highlighter::Highlighter(QTextDocument *parent, QColor syntaxColor, QColor comme
     rule.pattern = QRegularExpression(QStringLiteral("\".*\""));
     rule.format = quotationFormat;
     highlightingRules.append(rule);
-//! [4]
 
-//! [5]
+
     functionFormat.setFontItalic(true);
     functionFormat.setForeground(functionColor);
     rule.pattern = QRegularExpression(QStringLiteral("\\b[A-Za-z0-9_]+(?=\\()"));
     rule.format = functionFormat;
     highlightingRules.append(rule);
-//! [5]
 
 
     commentStartExpression = QRegularExpression(QStringLiteral("/\\*"));
     commentEndExpression = QRegularExpression(QStringLiteral("\\*/"));
 }
 
-void Highlighter::setSyntaxColor(QColor newColor) //Maybe just create new object?
+void Highlighter::setSyntaxColor(QColor newColor)
 {
     this->syntaxColor = newColor;
 
@@ -89,8 +86,7 @@ void Highlighter::highlightBlock(const QString &text)
         }
         else
         {
-            commentLength = endIndex - startIndex
-                            + match.capturedLength();
+            commentLength = endIndex - startIndex + match.capturedLength();
         }
         setFormat(startIndex, commentLength, multiLineCommentFormat);
         startIndex = text.indexOf(commentStartExpression, startIndex + commentLength);

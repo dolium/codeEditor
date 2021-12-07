@@ -1,7 +1,6 @@
 
 #ifndef CODEEDITOR_H
 #define CODEEDITOR_H
-
 #include <QPlainTextEdit>
 #include <QMenuBar>
 #include <QToolBar>
@@ -35,40 +34,37 @@
 #include <QFont>
 #include "mr_statusbar.h"
 #include "aboutdialog.h"
-QT_BEGIN_NAMESPACE
-class QPaintEvent;
-class QResizeEvent;
-class QSize;
-class QWidget;
-
-QT_END_NAMESPACE
-
-class LineNumberArea;
-
-//![codeeditordefinition]
-
+#include <QMap>
+#include <QDirIterator>
+#include <QFontMetrics>
 
 
 class Editor : public QPlainTextEdit
 {
     Q_OBJECT
-
 public:
-    void contextMenuEvent(QContextMenuEvent *event) override;
-
     Editor(QWidget *parent = nullptr);
+    void lineNumberAreaPaintEvent(QPaintEvent *event);
+private:
+    void contextMenuEvent(QContextMenuEvent *event) override;
+    QTextOption::WrapMode currentWrapMode;
+
+    QWidget *lineNumberArea;
+
     FindDialog *findDialog;
     FindDialog *replaceDialog;
-    QWidget *lineNumberArea;
+
     QFont currentFont;
-    QTextOption::WrapMode currentWrapMode;
-    QColor backgroundColor = Qt::gray;
+
+    QColor backgroundColor = Qt::gray; //stored here to use in updateBackgroundColor method.
+    //Copy stored in MainWindow too for use with QColorPicker dialog
     QColor textColor = Qt::black;
+
     QString textToFind;
     QString textToReplace;
 
     int countFind;
-    void lineNumberAreaPaintEvent(QPaintEvent *event);
+
     void updateBackgroundColor();
     void updateTextColor();
     void setTextColor(QColor color);
@@ -88,11 +84,10 @@ public slots:
     void showReplaceDialog();
     void selectLine();
     void selectWord();
-friend class MainWindow;
+    friend class MainWindow;
 };
 
-//![codeeditordefinition]
-//![extraarea]
+
 
 class LineNumberArea : public QWidget
 {
@@ -107,7 +102,6 @@ protected:
     {
         codeEditor->lineNumberAreaPaintEvent(event);
     }
-
 private:
     Editor *codeEditor;
 };
@@ -119,42 +113,54 @@ class MainWindow:public QMainWindow
 
 public:
     MainWindow();
-    QActionGroup *styleGroup;
-    QActionGroup *languageGroup;
-    Highlighter *highlighter;
-    mr_statusBar *status;
-    StyleCreatorDialog *styleDialog;
-    StyleSwitchDialog *styleSwitchDialog;
+private:
     Editor* mr_Editor;
     QToolBar *fileToolBar;
+    Highlighter *highlighter;
+    mr_statusBar *status;
+
+    StyleCreatorDialog *styleDialog;
+    StyleSwitchDialog *styleSwitchDialog;
+    QColorDialog* colorPicker;
+
+
+    QActionGroup *styleGroup;
+    QActionGroup *languageGroup;
     QAction *hideNumBar;
     QAction *hideToolBar;
     QAction *hideStatusBar;
     QAction *setWrappingAct;
     QAction *hideHighlightingAct;
-    QColorDialog* colorPicker;
-    QString currentFileName;
+    QVector<QAction*> stylesButtons;
+
+
+
     QSettings* currentThemeSettings;
     QSettings* availableThemes;
     QSettings* currentSettings;
-    QColor currentBackgroundColor;
-    QColor currentBlockColor;
+
+
     QString styleName;
-    QVector<QAction*> stylesButtons;
-    QVector<QString> themesPaths; //Vector of pairs name of style : path to this style. They go sequentially.
+    QString currentFileName;
     QString currentThemeName;
     QString currentThemePath;
     QString currentFilePath;
     QString rowColumnPosition;
+
+    QVector<QString> themesNames;
+    QVector<QString> themesPaths;
+    QVector<QString> themeNamesPaths;//Vector of pairs name of style : path to this style. Ordered sequentially name1 path1 name2 path2
+
     QLabel *rowColumnLabel;
     QLabel *lastModificationTime;
+
     QColor commentColor;
     QColor syntaxColor;
     QColor literalColor;
     QColor functionColor;
     QColor backgroundColor;
-    QVector<QString> themesNames;
-    QVector<QString> themesPathsReally;
+    QColor currentBlockColor;
+
     void createMenu();
     void setCurrentFileName(const QString &fileName);
     void createNewTheme(QString name = "Theme_1", QColor syntaxColor = Qt::magenta, QColor commentColor = Qt::darkCyan, QColor literalColor = Qt::darkRed, QColor functionColor = Qt::red, QColor backgroundColor = Qt::gray, QColor textColor = Qt::white);
@@ -169,7 +175,7 @@ public slots:
     void open();
     bool save();
     bool saveAs();
-    void about(){}
+    void about();
     void documentWasModified();
     void setBackgroungColor();
     void exit();
@@ -191,7 +197,6 @@ public slots:
     void openNewTheme();
     void setTextFont();
     void setTextWrapping();
-    void showAboutDialog();
 
 };
 //![extraarea]

@@ -4,7 +4,7 @@ void MainWindow::createMenu()
 
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
     fileToolBar = addToolBar(tr("File"));
-    const QIcon newIcon = QIcon("newIcon.png");
+    const QIcon newIcon = QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/newIcon.png");
     QAction *newAct = new QAction(newIcon, tr("&New"), this);
     newAct->setShortcuts(QKeySequence::New);
     newAct->setStatusTip(tr("Create a new file"));
@@ -13,7 +13,7 @@ void MainWindow::createMenu()
     fileToolBar->addAction(newAct);
 
 
-    const QIcon openIcon = QIcon("openIcon.png");
+    const QIcon openIcon = QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/openIcon.png");
     QAction *openAct = new QAction(openIcon, tr("&Open..."), this);
     openAct->setShortcuts(QKeySequence::Open);
     openAct->setStatusTip(tr("Open an existing file"));
@@ -22,7 +22,7 @@ void MainWindow::createMenu()
     fileToolBar->addAction(openAct);
 
 
-    const QIcon saveIcon =  QIcon("saveIcon.png");
+    const QIcon saveIcon =  QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/saveIcon.png");
     QAction *saveAct = new QAction(saveIcon, tr("&Save"), this);
     saveAct->setShortcuts(QKeySequence::Save);
     saveAct->setStatusTip(tr("Save the document to disk"));
@@ -30,12 +30,12 @@ void MainWindow::createMenu()
     fileMenu->addAction(saveAct);
     fileToolBar->addAction(saveAct);
 
-    const QIcon saveAsIcon = QIcon("saveAsIcon.png");
+    const QIcon saveAsIcon = QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/saveAsIcon.png");
     QAction *saveAsAct = fileMenu->addAction(saveAsIcon, tr("Save &As..."), this, &MainWindow::saveAs);
     saveAsAct->setShortcuts(QKeySequence::SaveAs);
     saveAsAct->setStatusTip(tr("Save the document under a new name"));
 
-    const QIcon exitIcon = QIcon("exitIcon.png");
+    const QIcon exitIcon = QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/exitIcon.png");
     QAction *exit = new QAction(exitIcon, tr("&Exit"), this);
     connect(exit, &QAction::triggered, this, &MainWindow::exit);
     exit->setStatusTip(tr("Quit the programm"));
@@ -101,82 +101,82 @@ void MainWindow::createMenu()
        viewMenu->addMenu(languageMenu);
    //End of creating language Menu
 
-       QAction *loadThemeAct = new QAction("Load new theme", this);
-       connect(loadThemeAct, &QAction::triggered, this, &MainWindow::openNewTheme);
-       viewMenu->addAction(loadThemeAct);
+    QAction *loadThemeAct = new QAction("Load new theme", this);
+    connect(loadThemeAct, &QAction::triggered, this, &MainWindow::openNewTheme);
+    viewMenu->addAction(loadThemeAct);
 
-       const QIcon styleCreatorIcon = QIcon::fromTheme("edit-paste", QIcon(":/images/paste.png"));
-       QAction *styleCreateAct = new QAction( tr("&Create new style"), this);
-       styleDialog = new StyleCreatorDialog(this);
-       connect(styleCreateAct, &QAction::triggered, this, &MainWindow::showThemeCreator);
-       viewMenu->addAction(styleCreateAct);
+    const QIcon styleCreatorIcon = QIcon::fromTheme("edit-paste", QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/paste.png"));
+    QAction *styleCreateAct = new QAction( tr("&Create new style"), this);
+    styleDialog = new StyleCreatorDialog(this);
+    connect(styleCreateAct, &QAction::triggered, this, &MainWindow::showThemeCreator);
+    viewMenu->addAction(styleCreateAct);
 
-       styleSwitchDialog = new StyleSwitchDialog(this, this->themesPaths);
-       QAction *styleSwitchAct = new QAction("Change style theme", this);
-       connect(styleSwitchAct, &QAction::triggered, this, &MainWindow::showStyleSwitch);
-       viewMenu->addAction(styleSwitchAct);
+    styleSwitchDialog = new StyleSwitchDialog(this, this->themeNamesPaths);
+    QAction *styleSwitchAct = new QAction("Change style theme", this);
+    connect(styleSwitchAct, &QAction::triggered, this, &MainWindow::showStyleSwitch);
+    viewMenu->addAction(styleSwitchAct);
 
-       QMenu *styleMenu = new QMenu{"Available styles"};
-        themesNames = styleSwitchDialog->getStyleNames();
-        themesPathsReally = styleSwitchDialog->getStylePaths();
-       styleGroup = new QActionGroup(this);
-       for (int i = 0; i < themesNames.length(); ++i)
-       {
-           QAction *themeAct = new QAction("set "+themesNames[i]+" style", this);
-           themeAct->setCheckable(true);
+    QMenu *styleMenu = new QMenu{"Available styles"};
+     themesNames = styleSwitchDialog->getStyleNames();
+     themesPaths = styleSwitchDialog->getStylePaths();
+    styleGroup = new QActionGroup(this);
+    for (int i = 0; i < themesNames.length(); ++i)
+    {
+        QAction *themeAct = new QAction("set "+themesNames[i]+" style", this);
+        themeAct->setCheckable(true);
 
-           if (currentSettings->contains("currentThemePath")and currentSettings->value("currentThemePath").toString()!="")
-           {
+        if (currentSettings->contains("currentThemePath")and currentSettings->value("currentThemePath").toString()!="")
+        {
 
-                QFileInfo tempThemeInfo{currentSettings->value("currentThemePath").toString()};
-                QString tempThemeName = tempThemeInfo.baseName();
-                if (themesNames[i]==tempThemeName) themeAct->setChecked(true);
-           }
-           else
-           {
-                if (i==0) themeAct->setChecked(true);
-           }
-           stylesButtons.append(themeAct);
-           styleGroup->addAction(themeAct);
-           connect(themeAct, &QAction::triggered, this, &MainWindow::applyCheckedTheme);
-       }
+             QFileInfo tempThemeInfo{currentSettings->value("currentThemePath").toString()};
+             QString tempThemeName = tempThemeInfo.baseName();
+             if (themesNames[i]==tempThemeName) themeAct->setChecked(true);
+        }
+        else
+        {
+             if (i==0) themeAct->setChecked(true);
+        }
+        stylesButtons.append(themeAct);
+        styleGroup->addAction(themeAct);
+        connect(themeAct, &QAction::triggered, this, &MainWindow::applyCheckedTheme);
+    }
 
-       for (int i = 0 ; i < themesNames.length(); ++i)
-       {
-           styleMenu->addAction(stylesButtons[i]);
-       }
+    for (int i = 0 ; i < themesNames.length(); ++i)
+    {
+        styleMenu->addAction(stylesButtons[i]);
+    }
 
-       viewMenu->addMenu(styleMenu);
-       applyCheckedTheme();
+    viewMenu->addMenu(styleMenu);
+    applyCheckedTheme();
 
 
    QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
-   const QIcon cutIcon = QIcon::fromTheme("edit-cut", QIcon(":/images/cut.png"));
+   const QIcon cutIcon = QIcon::fromTheme("edit-cut", QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/cut.png"));
    QAction *cutAct = new QAction(cutIcon, tr("Cu&t"), this);
    connect(cutAct, &QAction::triggered, mr_Editor, &QPlainTextEdit::cut);
    editMenu->addAction(cutAct);
 
-   const QIcon copyIcon = QIcon::fromTheme("edit-copy", QIcon(":/images/copy.png"));
+   const QIcon copyIcon =  QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/copyIcon.png");
    QAction *copyAct = new QAction(copyIcon, tr("&Copy"), this);
    connect(copyAct, &QAction::triggered, mr_Editor, &QPlainTextEdit::copy);
    editMenu->addAction(copyAct);
 
-   const QIcon pasteIcon = QIcon::fromTheme("edit-paste", QIcon(":/images/paste.png"));
+   const QIcon pasteIcon = QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/pasteIcon.png");
    QAction *pasteAct = new QAction(pasteIcon, tr("&Paste"), this);
    connect(pasteAct, &QAction::triggered, mr_Editor, &QPlainTextEdit::paste);
    editMenu->addAction(pasteAct);
 
-   const QIcon undoIcon = QIcon::fromTheme("edit-paste", QIcon(":/images/paste.png"));
+   const QIcon undoIcon = QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/undoIcon.png");
    QAction *undoAct = new QAction(pasteIcon, tr("&Undo"), this);
    connect(undoAct, &QAction::triggered, mr_Editor, &QPlainTextEdit::undo);
    editMenu->addAction(undoAct);
 
-   const QIcon reIcon = QIcon::fromTheme("edit-paste", QIcon(":/images/paste.png"));
+   const QIcon reIcon = QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/redoIcon.png");
    QAction *reAct = new QAction(reIcon, tr("&Repeat"), this);
    connect(reAct, &QAction::triggered, mr_Editor, &QPlainTextEdit::redo);
    editMenu->addAction(reAct);
 
-   const QIcon findIcon =  QIcon("findIcon.png");
+   const QIcon findIcon =  QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/findIcon.png");
    QAction *findAct = new QAction(findIcon, tr("&Find"), this);
    findAct->setStatusTip(tr("Find"));
 
@@ -186,7 +186,7 @@ void MainWindow::createMenu()
 
    editMenu->addAction(findAct);
    fileToolBar->addAction(findAct);
-   const QIcon findReplaceIcon = QIcon("findReplaceIcon.png");
+   const QIcon findReplaceIcon = QIcon("C:\\Users\\ivbon\\OneDrive\\Documents\\Programming\\codeeditor_3\\imgs\\findReplaceIcon.png");
    QAction *findReplaceAct = new QAction(findReplaceIcon, tr("&Find and replace"), this);
    findReplaceAct->setStatusTip("find and Replace");
 
@@ -204,9 +204,6 @@ void MainWindow::createMenu()
    editMenu->addAction(selectAllAct);
 
 
-
-
-
     QMenu* formatMenu = menuBar()->addMenu(tr("Format"));
 
     QAction *applyNewFontAct = new QAction ("Set new font", this);
@@ -221,9 +218,8 @@ void MainWindow::createMenu()
 
     QMenu* helpMenu = menuBar()->addMenu(tr("Help"));
     QAction *showAboutAct = new QAction("About programm");
-    connect(showAboutAct, &QAction::triggered, this, &MainWindow::showAboutDialog);
+    connect(showAboutAct, &QAction::triggered, this, &MainWindow::about);
     helpMenu->addAction(showAboutAct);
 
-   //connect(mr_Editor, &QPlainTextEdit::cursorPositionChanged, this, &MainWindow::updateStatusBar);
 
 }

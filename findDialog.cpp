@@ -1,4 +1,3 @@
-#include <QtWidgets>
 #include "findDialog.h"
 
 FindDialog::FindDialog(QWidget *parent, mode currentMode)
@@ -24,11 +23,12 @@ void FindDialog::setFindText()
 {
     QString text = lineEdit->text();
 
-    if (text.isEmpty()) {
-        QMessageBox::information(this, tr("Empty Field"),
-            tr("Please enter text to find\replace"));
+    if (text.isEmpty())
+    {
+        QMessageBox::information(this, tr("Empty Field"), tr("Please enter text to find\replace"));
         return;
-    } else
+    }
+    else
     {
         findText = text;
     }
@@ -44,12 +44,16 @@ void FindDialog::setReplaceText()
 void FindDialog::createReplaceMenu()
 {
     findLabel = new QLabel(tr("Find and replace:"));
+
     lineEdit = new QLineEdit;
     replaceLineEdit = new QLineEdit;
+
     findButton = new QPushButton(tr("&Find next"));
     replaceButton = new QPushButton (tr("Replace"));
     replaceAllButton = new QPushButton(tr("Replace All"));
+
     QHBoxLayout *layout = new QHBoxLayout;
+
     layout->addWidget(findLabel);
     layout->addWidget(lineEdit);
     layout->addWidget(replaceLineEdit);
@@ -68,22 +72,25 @@ void FindDialog::createFindMenu()
     findLabel = new QLabel(tr("Find:"));
     lineEdit = new QLineEdit;
     findButton = new QPushButton(tr("&Find next"));
+
     QHBoxLayout *layout = new QHBoxLayout;
+
     layout->addWidget(findLabel);
     layout->addWidget(lineEdit);
     layout->addWidget(findButton);
+
     setWindowTitle(tr("Find"));
     setLayout(layout);
 }
 
 
-QString FindDialog::getFindText()
+QString FindDialog::getFindText() const
 {
     return findText;
 }
 
 
-QString FindDialog::getReplaceText()
+QString FindDialog::getReplaceText() const
 {
     return textToReplace;
 }

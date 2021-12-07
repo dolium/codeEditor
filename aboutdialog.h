@@ -11,15 +11,15 @@ class aboutDialog : public QDialog
     Q_OBJECT
 public:
     aboutDialog(QWidget *parent);
-    void createGridGroupBox();
-    QGroupBox *gridGroupBox;
-    QPushButton *acceptButton;
+private:
+    QVBoxLayout* layout;
     QLabel* versionLabel;
     QLabel* developerInfoLabel;
     QLabel* developerPhotoLabel;
-    QVBoxLayout* layout;
-    QLabel * buildInfoLabel;
+    QLabel* buildInfoLabel;
+    QPushButton *acceptButton;
     QPixmap image;
+    void createGridGroupBox();
 };
 
 #endif // ABOUTDIALOG_H

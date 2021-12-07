@@ -1,10 +1,6 @@
 ﻿#include "mainwindow.h"
 #include "highlighter.h"
-#include <QMap>
-#include <QDirIterator>
-#include <QFontMetrics>
-//![constructor]
-//After cancelling choice of backgroundColor, backColor changes to black. Needs to be fixed
+
 
 
 MainWindow::MainWindow()
@@ -15,9 +11,8 @@ MainWindow::MainWindow()
     setCentralWidget(mr_Editor);
 
 
-    currentBackgroundColor = mr_Editor->backgroundColor;
     backgroundColor = mr_Editor->backgroundColor;
-    currentBlockColor = QColor(currentBackgroundColor).lighter(130);
+    currentBlockColor = QColor(mr_Editor->backgroundColor).lighter(130);
 
     initializeThemes();
 
@@ -108,12 +103,12 @@ void MainWindow::setThemeSettings(QString themePath)
         //If we do not have this theme - add it to themes list;
 
 
-        if (!themesPaths.contains(themePath) and (info.baseName()!=QString("default")))
+        if (!themeNamesPaths.contains(themePath) and (info.baseName()!=QString("default")))
         {
 
-            themesPaths.append(info.baseName());
-            themesPaths.append(info.absoluteFilePath());
-            availableThemes->setValue("themesPaths", QVariant(themesPaths));
+            themeNamesPaths.append(info.baseName());
+            themeNamesPaths.append(info.absoluteFilePath());
+            availableThemes->setValue("themesPaths", QVariant(themeNamesPaths));
         }
         updateTheme();
     }
@@ -122,7 +117,7 @@ void MainWindow::setThemeSettings(QString themePath)
 void MainWindow::initializeThemes()
 {
     availableThemes = new QSettings(QDir::currentPath()+QString{"/themes2.ini"}, QSettings::IniFormat);
-    themesPaths = availableThemes->value("themesPaths").value<QVector<QString>>();
+    themeNamesPaths = availableThemes->value("themesPaths").value<QVector<QString>>();
     findThemes();
 }
 
@@ -139,10 +134,10 @@ void MainWindow::findThemes() //finds themes and appends to themes list
         QString filePath = info.filePath();
         QSettings* curTheme = new QSettings(filePath, QSettings::IniFormat);
         QString isTheme = curTheme->value("isTheme").value<QString>();
-        if (!themesPaths.contains(fileName) and isTheme==QString{"itIsReallyTheme"})
+        if (!themeNamesPaths.contains(fileName) and isTheme==QString{"itIsReallyTheme"})
         {
-            themesPaths.append(fileName);
-            themesPaths.append(filePath);
+            themeNamesPaths.append(fileName);
+            themeNamesPaths.append(filePath);
         }
     }
 }
@@ -153,10 +148,10 @@ void MainWindow::deleteThemes(QVector<QString> paths)
     {
         QFileInfo fi(paths[i]);
         QString currentFileName = fi.baseName();
-        themesPaths.remove(themesPaths.indexOf(paths[i]));
-        themesPaths.remove(themesPaths.indexOf(currentFileName));
+        themeNamesPaths.remove(themeNamesPaths.indexOf(paths[i]));
+        themeNamesPaths.remove(themeNamesPaths.indexOf(currentFileName));
         QFile::remove(paths[i]);
-        availableThemes->setValue("themesPaths", QVariant(themesPaths));
+        availableThemes->setValue("themesPaths", QVariant(themeNamesPaths));
     }
 
 }
@@ -230,9 +225,9 @@ void MainWindow::createNewTheme(QString name, QColor _syntaxColor, QColor _comme
     dir.mkdir("themes");
 
     QString path = QDir::currentPath() + "/themes/" + name + ".ini";
-    themesPaths.append(name);
-    themesPaths.append(path);
-    availableThemes->setValue("themesPaths", QVariant(themesPaths));
+    themeNamesPaths.append(name);
+    themeNamesPaths.append(path);
+    availableThemes->setValue("themesPaths", QVariant(themeNamesPaths));
     currentThemeSettings = new QSettings(path, QSettings::IniFormat);
     currentThemeSettings->setValue("name", QVariant(name));
     currentThemeSettings->setValue("syntaxColor", QVariant(_syntaxColor));
@@ -267,7 +262,6 @@ void MainWindow::updateTheme()
     delete highlighter;
     highlighter = new Highlighter(this->mr_Editor->document(), syntaxColor, commentColor, literalColor, functionColor);
     mr_Editor->backgroundColor = backgroundColor;
-    currentBackgroundColor = backgroundColor;
     mr_Editor->updateBackgroundColor();
     mr_Editor->updateTextColor();
 
@@ -326,8 +320,7 @@ Editor::Editor(QWidget *parent) : QPlainTextEdit(parent)
 
 
     updateBackgroundColor();
-    /*
-    this->setStyleSheet("QPlainTextEdit {color: white;}");*/
+
     connect(this, &Editor::blockCountChanged, this, &Editor::updateLineNumberAreaWidth);
     connect(this, &Editor::updateRequest, this, &Editor::updateLineNumberArea);
     connect(this, &Editor::cursorPositionChanged, this, &Editor::highlightCurrentLine);
@@ -377,7 +370,7 @@ void MainWindow::enableHighlighting()
 }
 
 
-void Editor::updateLineNumberAreaWidth(int /* newBlockCount */)
+void Editor::updateLineNumberAreaWidth(int )
 {
     setViewportMargins(25, 0, 0, 0);
 }
@@ -420,7 +413,7 @@ void Editor::findAndHighlightR()
     moveCursor(QTextCursor::Start);
     for (int i = 0 ; i < countFind; ++i)
     {
-        if (!find(textToFind, QTextDocument::FindCaseSensitively)) //If no succes we go to previous cursor position
+        if (!find(textToFind, QTextDocument::FindCaseSensitively)) //If no succes go to previous cursor position
             {
                 QTextCursor cur{this->document()};
                 cur.setPosition(currentpos);
@@ -439,7 +432,7 @@ void Editor::findAndHighlightForFindInFindAndReplace()
     moveCursor(QTextCursor::Start);
     for (int i = 0 ; i < countFind; ++i)
     {
-        if (!find(textToFind, QTextDocument::FindCaseSensitively)) //If no succes we go to previous cursor position
+        if (!find(textToFind, QTextDocument::FindCaseSensitively)) //If no succes go to previous cursor position
             {
                 QTextCursor cur{this->document()};
                 cur.setPosition(currentpos);
@@ -486,12 +479,13 @@ void MainWindow::setTextWrapping()
     }
     else
     {
-        currentSettings->setValue("wordWrappingEnabled", QVariant(false));         currentSettings->sync();
+        currentSettings->setValue("wordWrappingEnabled", QVariant(false));
+        currentSettings->sync();
     }
 
 }
 
-void MainWindow::showAboutDialog()
+void MainWindow::about()
 {
     aboutDialog *dialog = new aboutDialog{this};
     dialog->show();
@@ -539,11 +533,9 @@ void MainWindow::changeBlockColor()
     currentBlockColor = blockColor;
     QTextCursor cursor(mr_Editor->textCursor());
 
-    // change block format (will set the yellow background)
     QTextBlockFormat blockFormat = cursor.blockFormat();
     blockFormat.setBackground(blockColor);
-    /*blockFormat.setNonBreakableLines(true);
-    blockFormat.setPageBreakPolicy(QTextFormat::PageBreak_AlwaysBefore);*/
+
     cursor.setBlockFormat(blockFormat);
 }
 
@@ -638,7 +630,7 @@ void Editor::highlightCurrentLine()
 }
 
 
-//Draw numbers and set grey color color
+//Draw numbers and set smart-color
 void Editor::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
     QPainter painter(lineNumberArea);
@@ -685,24 +677,17 @@ void MainWindow::open()
       QFileInfo fi(fileName);
       setCurrentFileName(fi.fileName());
       currentFilePath = fileName;
-           if (!file.open(QFile::ReadOnly | QFile::Text)) {
-               QMessageBox::warning(this, tr("Application"),
-                                    tr("Cannot read file %1:\n%2.")
-                                    .arg(QDir::toNativeSeparators(fileName), file.errorString()));
-               return;
-           }
+      if (!file.open(QFile::ReadOnly | QFile::Text))
+      {
+          QMessageBox::warning(this, tr("Application"),tr("Cannot read file %1:\n%2.").arg(QDir::toNativeSeparators(fileName), file.errorString()));
+          return;
+      }
 
            QTextStream in(&file);
-       #ifndef QT_NO_CURSOR
            QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-       #endif
            mr_Editor->setPlainText(in.readAll());
-       #ifndef QT_NO_CURSOR
            QGuiApplication::restoreOverrideCursor();
-       #endif
     }
-    //statusBar()->showMessage(tr("FIle loaded successfuly!"));
-    //updateModificationTime();
 
     status->updateModificationTime();
     status->updateSizeInfo(currentFilePath);
@@ -714,7 +699,6 @@ void MainWindow::updateStatusBar()
     statusBar()->removeWidget(status);
     status = new mr_statusBar{this, mr_Editor};
     statusBar()->addWidget(status);
-
 }
 
 void MainWindow::applyCheckedTheme()
@@ -723,10 +707,9 @@ void MainWindow::applyCheckedTheme()
     {
         if (stylesButtons[i]->isChecked())
         {
-            currentSettings->setValue("currentThemePath", QVariant(themesPathsReally[i]));
-            setThemeSettings(themesPathsReally[i]);
+            currentSettings->setValue("currentThemePath", QVariant(themesPaths[i]));
+            setThemeSettings(themesPaths[i]);
         }
-
     }
 }
 
@@ -773,14 +756,12 @@ bool MainWindow::save()
                 out << mr_Editor->toPlainText();
                 if (!file.commit())
                 {
-                    errorMessage = tr("Cannot write file %1:\n%2.")
-                                   .arg(QDir::toNativeSeparators(fileName), file.errorString());
+                    errorMessage = tr("Cannot write file %1:\n%2.").arg(QDir::toNativeSeparators(fileName), file.errorString());
                 }
             }
             else
             {
-                errorMessage = tr("Cannot open file %1 for writing:\n%2.")
-                               .arg(QDir::toNativeSeparators(fileName), file.errorString());
+                errorMessage = tr("Cannot open file %1 for writing:\n%2.").arg(QDir::toNativeSeparators(fileName), file.errorString());
             }
             QGuiApplication::restoreOverrideCursor();
 
@@ -792,8 +773,7 @@ bool MainWindow::save()
 
         }
 
-    //statusBar()->showMessage(tr("File saved successfully!"));
-    //updateModificationTime();
+
     status->updateModificationTime();
     status->updateSizeInfo(currentFilePath);
     setWindowModified(false);
@@ -802,9 +782,7 @@ bool MainWindow::save()
 
 bool MainWindow::saveAs()
 {
-    QString fileName = QFileDialog::getSaveFileName(this,
-        tr("Save code"), "",
-        tr("C++ code (*.cpp *.h *.cxx *.hpp);;All Files (*)"));
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Save code"), "", tr("C++ code (*.cpp *.h *.cxx *.hpp);;All Files (*)"));
     QFileInfo fi{fileName};
     currentFilePath = fileName;
     setCurrentFileName(fi.fileName());
@@ -823,14 +801,12 @@ bool MainWindow::saveAs()
                 out << mr_Editor->toPlainText();
                 if (!file.commit())
                 {
-                    errorMessage = tr("Cannot write file %1:\n%2.")
-                                   .arg(QDir::toNativeSeparators(fileName), file.errorString());
+                    errorMessage = tr("Cannot write file %1:\n%2.").arg(QDir::toNativeSeparators(fileName), file.errorString());
                 }
             }
             else
             {
-                errorMessage = tr("Cannot open file %1 for writing:\n%2.")
-                               .arg(QDir::toNativeSeparators(fileName), file.errorString());
+                errorMessage = tr("Cannot open file %1 for writing:\n%2.").arg(QDir::toNativeSeparators(fileName), file.errorString());
             }
             QGuiApplication::restoreOverrideCursor();
 
@@ -842,8 +818,7 @@ bool MainWindow::saveAs()
 
         }
 
-    //statusBar()->showMessage(tr("File saved successfully!"));
-    //updateModificationTime();
+
     status->updateModificationTime();
     status->updateSizeInfo(currentFilePath);
     setWindowModified(false);
@@ -853,7 +828,6 @@ bool MainWindow::saveAs()
 void MainWindow::setBackgroungColor()
 {
     mr_Editor->backgroundColor = colorPicker->getColor();
-    currentBackgroundColor = mr_Editor->backgroundColor;
     backgroundColor = mr_Editor->backgroundColor;
     mr_Editor->updateBackgroundColor();
 }
@@ -865,7 +839,6 @@ void MainWindow::exit()
     QWidget::close();
     delete highlighter;
 }
-//Icons path need to be changed.
 
 
 void MainWindow::documentWasModified()
@@ -884,7 +857,9 @@ void MainWindow::setCurrentFileName(const QString &fileName)
 
     QString shownName = currentFileName;
     if (currentFileName.isEmpty())
+    {
         shownName = "untitled.cpp";
+    }
     setWindowFilePath(shownName);
 }
 

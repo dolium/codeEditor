@@ -1,5 +1,5 @@
 #include "stylecreatordialog.h"
-#include "QColorDialog"
+
 
 StyleCreatorDialog::StyleCreatorDialog(QWidget *parent):QDialog(parent)
 {

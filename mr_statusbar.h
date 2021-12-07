@@ -1,5 +1,9 @@
 #ifndef MR_STATUSBAR_H
 #define MR_STATUSBAR_H
+
+#include <QStatusBar>
+#include <QRegularExpression>
+#include <QString>
 #include <QMainWindow>
 #include <QWidget>
 #include <QTime>
@@ -25,14 +29,16 @@ public:
     int fileSize;
     int wordsCount;
     int characterCount;
-    void updateCountInfo();
-    void addAllWidgets();
-    void removeAllWidgets();
+
+
     void updateSizeInfo(QString path);
 public slots:
     void updateRowColumn();
     void updateModificationTime();
-
+    void updateCountInfo();
+private:
+    void addAllWidgets();
+    void removeAllWidgets();
 
 };
 

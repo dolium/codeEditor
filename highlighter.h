@@ -29,7 +29,7 @@ public:
 
 protected:
     void highlightBlock(const QString &text) override;
-    void setKeywords();
+
 
 private:
     struct HighlightingRule
@@ -53,9 +53,10 @@ private:
     QVector<QString> keywordPatterns20;
     QVector<QString> keywordPatterns_C2018;
     QVector <QString> keywords;
-    void setKeywordPatterns11(){keywords = keywordPatterns11;}
-    void setKeywordPatterns20(){keywords = keywordPatterns20;}
-    void setKeywordPatterns_C2018(){keywords = keywordPatterns_C2018;}
+    void setKeywordData();
+    inline void setKeywordPatterns11(){keywords = keywordPatterns11;}
+    inline void setKeywordPatterns20(){keywords = keywordPatterns20;}
+    inline void setKeywordPatterns_C2018(){keywords = keywordPatterns_C2018;}
 };
 //! [0]
 

@@ -1,7 +1,5 @@
 #include "mr_statusbar.h"
-#include <QStatusBar>
-#include <QRegularExpression>
-#include <QString>
+
 mr_statusBar::mr_statusBar(QMainWindow *parent, QPlainTextEdit* edit) : QWidget(parent)
 {
     wordsCount = 0;

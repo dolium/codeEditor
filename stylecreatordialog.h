@@ -1,4 +1,5 @@
 #ifndef STYLECREATORDIALOG_H
+
 #define STYLECREATORDIALOG_H
 
 #include <QDialog>
@@ -10,6 +11,7 @@
 #include <QGroupBox>
 #include <QTextEdit>
 #include "highlighter.h"
+#include "QColorDialog"
 
 class StyleCreatorDialog : public QDialog
 {

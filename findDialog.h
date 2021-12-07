@@ -4,6 +4,11 @@
 #include <QDialog>
 #include <QLabel>
 #include <QPlainTextEdit>
+#include <QLineEdit>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QMessageBox>
+#include <QPushButton>
 QT_BEGIN_NAMESPACE
 class QLineEdit;
 class QPushButton;
@@ -18,25 +23,26 @@ class FindDialog : public QDialog
 public:
     enum mode{FIND, FIND_AND_REPLACE};
     FindDialog(QWidget *parent, mode currentMode);
-    QString getFindText();
-    QString getReplaceText();
-    QString textToReplace;
-    QLabel *findLabel;
     mode currentMode;
+
+    QString getFindText()const;
+    QString getReplaceText()const;
+
     QPushButton *findButton;
     QPushButton *replaceButton;
     QPushButton *replaceAllButton;
-    QLineEdit *lineEdit;
-    QLineEdit *replaceLineEdit;
 
     void findAndHighlight(QString text);
 public slots:
     void setFindText();
     void setReplaceText();
 private:
-
     QString findText;
     void createFindMenu();
     void createReplaceMenu();
+    QString textToReplace;
+    QLabel *findLabel;
+    QLineEdit *lineEdit;
+    QLineEdit *replaceLineEdit;
 };
 #endif

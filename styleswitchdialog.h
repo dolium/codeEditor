@@ -16,41 +16,54 @@ class StyleSwitchDialog : public QDialog
 {
 public:
     StyleSwitchDialog(QWidget* parent, QVector<QString> pathAndNames);
-    QString getPath(){return currentPath;}
-    QString getName(){return currentName;}
-    QVector<QString> getStyleNames(){return names;}
-    QVector<QString> getStylePaths(){return paths;}
-    QVector<QString> getDeleteThemes(){return themesToDelete;}
+
+
+    QString getPath()const{return currentPath;}
+    QString getName()const{return currentName;}
+    QVector<QString> getStyleNames()const {return names;}
+    QVector<QString> getStylePaths()const{return paths;}
+    QVector<QString> getDeleteThemes()const{return themesToDelete;}
+
+
+
+private:
+    QGroupBox *gridGroupBox;
+    QPlainTextEdit *smallEditor;
+    QColorDialog *colorDialog;
+
+    QVector<QString> names;
+    QVector<QString> paths;
+
+    QVector<QLabel*> labels;
+    QVector<QRadioButton *>radioButtons;
+    QVector<QString>themesToDelete;
+    QVector<QPushButton*> pickButton;
+    QVector<QPushButton *>deleteButtons;
+
+    QPushButton *acceptButton;
+    QPushButton *acceptChanges;
+
+    QString currentPath;
+    QString currentName;
+    QSettings* theme;
+
     Highlighter *highlighter;
     QColor syntaxColor    ;
     QColor commentColor   ;
     QColor literalColor   ;
     QColor functionColor  ;
     QColor backgroundColor;
-    QColor textColor;
+    QColor textColor      ;
+
+
+    void createGridGroupBox();
+    void createPathAndNames(QVector<QString>);
     void setThemeSettings(QString path);
     void updateTheme();
     void updateBackgroundColor();
     void updateTextColor();
     void showPossibleChanges();
-    QVector<QPushButton *>deleteButtons;
-    QVector<QString>themesToDelete;
-private:
-    QGroupBox *gridGroupBox;
-    QPlainTextEdit *smallEditor;
-    QVector<QString> names;
-    QVector<QString> paths;
-    QVector<QRadioButton *>radioButtons;
-    QVector<QLabel*> labels;
-    QVector<QPushButton*> pickButton;
-    QPushButton *acceptButton;
-    QPushButton *acceptChanges;
-    void createGridGroupBox();
-    void createPathAndNames(QVector<QString>);
-    QString currentPath;
-    QString currentName;
-    QColorDialog *colorDialog;
-    QSettings* theme;
+
 
 public slots:
     void setCurrentData();
@@ -63,4 +76,4 @@ public slots:
     void pickTextColor();
     void reformTheme();
 };
-#endif // STYLESWITCHDIALOG_H
+#endif

@@ -1,6 +1,6 @@
 #include "highlighter.h"
 
-void Highlighter::setKeywords()
+void Highlighter::setKeywordData()
 {
     keywordPatterns11 = {
         QStringLiteral("\\balignas\\b"),    QStringLiteral("\\bcase\\b"),QStringLiteral("\\bcontinue\\b"),QStringLiteral("\\bexport\\b"),
