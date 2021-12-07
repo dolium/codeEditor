@@ -13,14 +13,13 @@ Highlighter::Highlighter(QTextDocument *parent, QColor syntaxColor, QColor comme
     if (syntaxType == keywordsSyntax::CXX20) setKeywordPatterns20();
     if (syntaxType == keywordsSyntax::CXX11) setKeywordPatterns11();
     if (syntaxType == keywordsSyntax::C2018) setKeywordPatterns_C2018();
-    for (const QString &pattern : keywords)
+    for (const QString &wordPattern : keywords)
     {
-        rule.pattern = QRegularExpression(pattern);
+        rule.pattern = QRegularExpression(wordPattern);
         rule.format = keywordFormat;
         highlightingRules.append(rule);
     }
 
-    highlightingRules.append(rule);
 
 
     singleLineCommentFormat.setForeground(commentColor);
@@ -58,7 +57,7 @@ void Highlighter::setSyntaxColor(QColor newColor)
 void Highlighter::highlightBlock(const QString &text)
 {
     if(enabled == false){return;}
-    for (const HighlightingRule &rule : qAsConst(highlightingRules))
+    for (const HighlightingRule &rule : highlightingRules)
     {
         QRegularExpressionMatchIterator matchIterator = rule.pattern.globalMatch(text);
         while (matchIterator.hasNext())

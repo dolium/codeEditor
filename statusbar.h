@@ -1,5 +1,5 @@
-#ifndef MR_STATUSBAR_H
-#define MR_STATUSBAR_H
+#ifndef STATUSBAR_H
+#define STATUSBAR_H
 
 #include <QStatusBar>
 #include <QRegularExpression>
@@ -11,11 +11,11 @@
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QFileInfo>
-class mr_statusBar : public QWidget
+class statusBarFooter : public QWidget
 {
     Q_OBJECT
 public:
-    mr_statusBar(QMainWindow *parent, QPlainTextEdit* edit);
+    statusBarFooter(QMainWindow *parent, QPlainTextEdit* edit);
     QLabel *rowColumnLabel;
     QLabel *lastModificationTime;
     int wordsCharacterCount;
@@ -42,4 +42,4 @@ private:
 
 };
 
-#endif // MR_STATUSBAR_H
+#endif // STATUSBAR_H

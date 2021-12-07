@@ -33,6 +33,7 @@ StyleCreatorDialog::StyleCreatorDialog(QWidget *parent):QDialog(parent)
 
 }
 
+
 void StyleCreatorDialog::updateTheme()
 {
 
@@ -41,6 +42,7 @@ void StyleCreatorDialog::updateTheme()
 
 }
 
+
 void StyleCreatorDialog::updateTextColor()
 {
     QPalette palette = smallEditor->palette();
@@ -48,12 +50,15 @@ void StyleCreatorDialog::updateTextColor()
     smallEditor->setPalette(palette);
 }
 
+
 void StyleCreatorDialog::updateBackgroundColor()
 {
     QPalette palette;
     palette.setColor(QPalette::Base, backgroundColor);
     smallEditor->setPalette(palette);
 }
+
+
 void StyleCreatorDialog::showPossibleChanges()
 {
     updateTheme();
@@ -96,11 +101,13 @@ void StyleCreatorDialog::pickBackgroundColor()
      showPossibleChanges();
 }
 
+
 void StyleCreatorDialog::pickTextColor()
 {
     textColor = colorDialog->getColor();
      showPossibleChanges();
 }
+
 
 void StyleCreatorDialog::setStyleName()
 {
@@ -141,5 +148,4 @@ void StyleCreatorDialog::createGridGroupBox()
     layout->setColumnStretch(2, 30);
     highlighter = new Highlighter(smallEditor->document());
     gridGroupBox->setLayout(layout);
-
 }

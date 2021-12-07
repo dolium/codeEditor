@@ -7,22 +7,22 @@ MainWindow::MainWindow()
 {
 
     if (QFile::exists(QDir::currentPath() + "/settings/"+"currentSettings.ini")) currentSettings = new QSettings(QDir::currentPath() + "/settings/"+"currentSettings.ini", QSettings::IniFormat);
-    mr_Editor = new Editor{};
-    setCentralWidget(mr_Editor);
+    mainEditor = new Editor{};
+    setCentralWidget(mainEditor);
 
 
-    backgroundColor = mr_Editor->backgroundColor;
-    currentBlockColor = QColor(mr_Editor->backgroundColor).lighter(130);
+    backgroundColor = mainEditor->backgroundColor;
+    currentBlockColor = QColor(mainEditor->backgroundColor).lighter(130);
 
     initializeThemes();
 
 
     syntaxColor = Qt::darkBlue;
-    highlighter =  new Highlighter(mr_Editor->document(), syntaxColor);
+    highlighter =  new Highlighter(mainEditor->document(), syntaxColor);
     createMenu(); //Very sensitive to its position
 
     colorPicker = new QColorDialog({0,1,1}, this);
-    connect(mr_Editor->document(), &QTextDocument::contentsChanged,
+    connect(mainEditor->document(), &QTextDocument::contentsChanged,
             this, &MainWindow::documentWasModified);
     setUnifiedTitleAndToolBarOnMac(true);
     setCurrentFileName("untitled.cpp");
@@ -39,12 +39,13 @@ MainWindow::MainWindow()
     {
         initSettings();
     }
-    status = new mr_statusBar{this, mr_Editor};
+    status = new statusBarFooter{this, mainEditor};
     statusBar()->addWidget(status);
-    connect(mr_Editor, &QPlainTextEdit::cursorPositionChanged, status, &mr_statusBar::updateRowColumn);
-    connect(mr_Editor, &QPlainTextEdit::cursorPositionChanged, status, &mr_statusBar::updateCountInfo);
+    connect(mainEditor, &QPlainTextEdit::cursorPositionChanged, status, &statusBarFooter::updateRowColumn);
+    connect(mainEditor, &QPlainTextEdit::cursorPositionChanged, status, &statusBarFooter::updateCountInfo);
 
 }
+
 
 void MainWindow::showThemeCreator()
 {
@@ -57,11 +58,12 @@ void MainWindow::showThemeCreator()
        functionColor   =styleDialog->getFunctionColor();
        backgroundColor =styleDialog->getBackgroundColor();
        QColor tempTextColor = styleDialog->getTextColor();
-       mr_Editor->backgroundColor = backgroundColor;
+       mainEditor->backgroundColor = backgroundColor;
        styleName = styleDialog->getStyleName();
        createNewTheme(styleName, syntaxColor, commentColor, literalColor, functionColor, backgroundColor, tempTextColor);
     }
 }
+
 
 void MainWindow::showStyleSwitch()
 {
@@ -77,6 +79,7 @@ void MainWindow::showStyleSwitch()
         deleteThemes(styleSwitchDialog->getDeleteThemes());
     }
 }
+
 
 void MainWindow::setThemeSettings(QString themePath)
 {
@@ -96,9 +99,9 @@ void MainWindow::setThemeSettings(QString themePath)
         literalColor = theme->value("literalColor").value<QColor>();
         functionColor = theme->value("functionColor").value<QColor>();
         backgroundColor = theme->value("backgroundColor").value<QColor>();
-        mr_Editor->backgroundColor = backgroundColor;
-        mr_Editor->setTextColor(theme->value("textColor").value<QColor>());
-        mr_Editor->updateTextColor();
+        mainEditor->backgroundColor = backgroundColor;
+        mainEditor->setTextColor(theme->value("textColor").value<QColor>());
+        mainEditor->updateTextColor();
         QFileInfo info{themePath};
         //If we do not have this theme - add it to themes list;
 
@@ -114,12 +117,14 @@ void MainWindow::setThemeSettings(QString themePath)
     }
 }
 
+
 void MainWindow::initializeThemes()
 {
     availableThemes = new QSettings(QDir::currentPath()+QString{"/themes2.ini"}, QSettings::IniFormat);
     themeNamesPaths = availableThemes->value("themesPaths").value<QVector<QString>>();
     findThemes();
 }
+
 
 void MainWindow::findThemes() //finds themes and appends to themes list
 {
@@ -142,6 +147,7 @@ void MainWindow::findThemes() //finds themes and appends to themes list
     }
 }
 
+
 void MainWindow::deleteThemes(QVector<QString> paths)
 {
     for (int i = 0; i < paths.length(); ++i)
@@ -155,6 +161,7 @@ void MainWindow::deleteThemes(QVector<QString> paths)
     }
 
 }
+
 
 void MainWindow::applySettings()
 {
@@ -186,18 +193,19 @@ void MainWindow::applySettings()
     ff.fromString(currentSettings->value("currentFontFamily").toString());
     ff.setStyleHint(QFont::Monospace);
     ff.setFixedPitch(true);
-    mr_Editor->setFont(ff);
+    mainEditor->setFont(ff);
     const int tabStop = 4;  // 4 characters
 
     QFontMetrics metrics(ff);
-    mr_Editor->setTabStopDistance(tabStop * metrics.maxWidth());
+    mainEditor->setTabStopDistance(tabStop * metrics.maxWidth());
 
-    mr_Editor->currentFont = ff;
+    mainEditor->currentFont = ff;
 
-     mr_Editor->setFont(ff);
+     mainEditor->setFont(ff);
 
      //End of font
 }
+
 
 void MainWindow::initSettings()
 {
@@ -208,15 +216,15 @@ void MainWindow::initSettings()
     currentSettings->setValue("wordWrappingEnabled", QVariant(true));
     currentSettings->setValue("statusBarEnabled", QVariant(true));
     currentSettings->setValue("currentThemePath", QVariant(currentThemePath));
-    currentSettings->setValue("currentFontFamily", QVariant(mr_Editor->currentFont.toString()));
+    currentSettings->setValue("currentFontFamily", QVariant(mainEditor->currentFont.toString()));
     currentSettings->sync();
 }
+
 
 void MainWindow::newFile()
 {
     saveAs();
 }
-
 
 
 void MainWindow::createNewTheme(QString name, QColor _syntaxColor, QColor _commentColor, QColor _literalColor, QColor _functionColor, QColor _backgroundColor, QColor _textColor)
@@ -250,23 +258,25 @@ void MainWindow::createNewTheme(QString name, QColor _syntaxColor, QColor _comme
     this->functionColor  =_functionColor  ;
     this->backgroundColor=_backgroundColor;
 
-    mr_Editor->backgroundColor = _backgroundColor;
-    mr_Editor->setTextColor(_textColor);
+    mainEditor->backgroundColor = _backgroundColor;
+    mainEditor->setTextColor(_textColor);
     updateTheme();
 
 
 }
 
+
 void MainWindow::updateTheme()
 {
     delete highlighter;
-    highlighter = new Highlighter(this->mr_Editor->document(), syntaxColor, commentColor, literalColor, functionColor);
-    mr_Editor->backgroundColor = backgroundColor;
-    mr_Editor->updateBackgroundColor();
-    mr_Editor->updateTextColor();
+    highlighter = new Highlighter(this->mainEditor->document(), syntaxColor, commentColor, literalColor, functionColor);
+    mainEditor->backgroundColor = backgroundColor;
+    mainEditor->updateBackgroundColor();
+    mainEditor->updateTextColor();
 
 
 }
+
 
 void MainWindow::updateRowColumn()
 {
@@ -277,7 +287,7 @@ void MainWindow::updateRowColumn()
         statusBar()->removeWidget(rowColumnLabel);
     }
 
-    rowColumnPosition = "Row/column position: "+QString::number(mr_Editor->textCursor().blockNumber())+" | " + QString::number(mr_Editor->textCursor().positionInBlock());
+    rowColumnPosition = "Row/column position: "+QString::number(mainEditor->textCursor().blockNumber())+" | " + QString::number(mainEditor->textCursor().positionInBlock());
 
     rowColumnLabel = new QLabel(rowColumnPosition, this);
     statusBar()->clearMessage();
@@ -289,6 +299,7 @@ void MainWindow::updateRowColumn()
         statusBar()->addWidget(rowColumnLabel);
     }
 }
+
 
 void MainWindow::updateModificationTime()
 {
@@ -307,6 +318,8 @@ void MainWindow::updateModificationTime()
      }
 
 }
+
+
 Editor::Editor(QWidget *parent) : QPlainTextEdit(parent)
 {
     setWindowTitle(QObject::tr("Editor"));
@@ -333,21 +346,22 @@ Editor::Editor(QWidget *parent) : QPlainTextEdit(parent)
 
 }
 
+
 void MainWindow::enableNumBar()
 {
     if (!hideNumBar->isChecked())
     {
-        mr_Editor->lineNumberArea->setVisible(false);
-        mr_Editor->setViewportMargins(0, 0, 0, 0);
-        disconnect(mr_Editor, &Editor::blockCountChanged, mr_Editor, &Editor::updateLineNumberAreaWidth);
+        mainEditor->lineNumberArea->setVisible(false);
+        mainEditor->setViewportMargins(0, 0, 0, 0);
+        disconnect(mainEditor, &Editor::blockCountChanged, mainEditor, &Editor::updateLineNumberAreaWidth);
         currentSettings->setValue("numberBarEnabled", QVariant(false));
         currentSettings->sync();
     }
     else if(hideNumBar->isChecked()==true)
     {
-        mr_Editor->lineNumberArea->setVisible(true);
-        mr_Editor->setViewportMargins(25, 0, 0, 0);
-        connect(mr_Editor, &Editor::blockCountChanged, mr_Editor, &Editor::updateLineNumberAreaWidth);
+        mainEditor->lineNumberArea->setVisible(true);
+        mainEditor->setViewportMargins(25, 0, 0, 0);
+        connect(mainEditor, &Editor::blockCountChanged, mainEditor, &Editor::updateLineNumberAreaWidth);
         currentSettings->setValue("numberBarEnabled", QVariant(true));
         currentSettings->sync();
 
@@ -355,17 +369,18 @@ void MainWindow::enableNumBar()
 
 }
 
+
 void MainWindow::enableHighlighting()
 {
     if (!hideHighlightingAct->isChecked())
     {
         highlighter->enabled = false;
-        mr_Editor->setPlainText(mr_Editor->document()->toPlainText());
+        mainEditor->setPlainText(mainEditor->document()->toPlainText());
     }
     else
     {
         highlighter->enabled = true;
-        mr_Editor->setPlainText(mr_Editor->document()->toPlainText());
+        mainEditor->setPlainText(mainEditor->document()->toPlainText());
     }
 }
 
@@ -404,6 +419,7 @@ void Editor::findAndHighlight()
     }
 }
 
+
 void Editor::findAndHighlightR()
 {
      countFind = 1;
@@ -421,6 +437,7 @@ void Editor::findAndHighlightR()
             }
     }
 }
+
 
 void Editor::findAndHighlightForFindInFindAndReplace()
 {
@@ -441,6 +458,7 @@ void Editor::findAndHighlightForFindInFindAndReplace()
     }
 }
 
+
 void Editor::showFindDialog()
 {
     countFind = 0;
@@ -448,30 +466,33 @@ void Editor::showFindDialog()
 
 }
 
+
 void Editor::showReplaceDialog()
 {
     countFind = 0;
     replaceDialog->show();
 }
 
+
 void MainWindow::setTextFont()
 {
-    mr_Editor->setFont(QFontDialog::getFont(0, mr_Editor->font()));
-    mr_Editor->currentFont = mr_Editor->font();
-    currentSettings->setValue("currentFontFamily", QVariant(mr_Editor->currentFont.toString()));
+    mainEditor->setFont(QFontDialog::getFont(0, mainEditor->font()));
+    mainEditor->currentFont = mainEditor->font();
+    currentSettings->setValue("currentFontFamily", QVariant(mainEditor->currentFont.toString()));
     currentSettings->sync();
 
 }
 
+
 void MainWindow::setTextWrapping()
 {
-    mr_Editor->currentWrapMode = QTextOption::NoWrap;
-    mr_Editor->setWordWrapMode(QTextOption::NoWrap);
+    mainEditor->currentWrapMode = QTextOption::NoWrap;
+    mainEditor->setWordWrapMode(QTextOption::NoWrap);
     if (setWrappingAct->isChecked())
     {
-        mr_Editor->setLineWrapMode(QPlainTextEdit::LineWrapMode::WidgetWidth);
-        mr_Editor->currentWrapMode =  QTextOption::WordWrap;
-        mr_Editor->setWordWrapMode(QTextOption::WordWrap);
+        mainEditor->setLineWrapMode(QPlainTextEdit::LineWrapMode::WidgetWidth);
+        mainEditor->currentWrapMode =  QTextOption::WordWrap;
+        mainEditor->setWordWrapMode(QTextOption::WordWrap);
         currentSettings->setValue("wordWrappingEnabled", QVariant(true));
         currentSettings->sync();
 
@@ -485,11 +506,13 @@ void MainWindow::setTextWrapping()
 
 }
 
+
 void MainWindow::about()
 {
     aboutDialog *dialog = new aboutDialog{this};
     dialog->show();
 }
+
 
 void Editor::selectLine()
 {
@@ -497,11 +520,14 @@ void Editor::selectLine()
     moveCursor(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
 }
 
+
 void Editor::selectWord()
 {
     moveCursor(QTextCursor::StartOfWord);
     moveCursor(QTextCursor::EndOfWord, QTextCursor::KeepAnchor);
 }
+
+
 void Editor::replace()
 {
     if (!this->textCursor().hasSelection())
@@ -515,6 +541,7 @@ void Editor::replace()
         this->setTextCursor(tempcursor);
     }
 
+
 void Editor::replaceAll(){
 
     moveCursor(QTextCursor::Start);
@@ -527,11 +554,13 @@ void Editor::replaceAll(){
             this->textCursor().insertText(textToReplace);
     }
 }
+
+
 void MainWindow::changeBlockColor()
 {
     QColor blockColor = colorPicker->getColor();
     currentBlockColor = blockColor;
-    QTextCursor cursor(mr_Editor->textCursor());
+    QTextCursor cursor(mainEditor->textCursor());
 
     QTextBlockFormat blockFormat = cursor.blockFormat();
     blockFormat.setBackground(blockColor);
@@ -580,6 +609,7 @@ void MainWindow::enableStatusBar()
     }
 }
 
+
 void Editor::updateBackgroundColor()
 {
     QPalette palette;
@@ -588,12 +618,14 @@ void Editor::updateBackgroundColor()
     highlightCurrentLine();
 }
 
+
 void Editor::updateTextColor()
 {
     QPalette palette = this->palette();
     palette.setColor(QPalette::Text, textColor);
     setPalette(palette);
 }
+
 
 void Editor::setTextColor(QColor color)
 {
@@ -629,7 +661,6 @@ void Editor::highlightCurrentLine()
     setExtraSelections(extraSelections);
 }
 
-
 //Draw numbers and set smart-color
 void Editor::lineNumberAreaPaintEvent(QPaintEvent *event)
 {
@@ -662,7 +693,6 @@ void Editor::lineNumberAreaPaintEvent(QPaintEvent *event)
 }
 
 
-
 void MainWindow::open()
 {
     QString fileName = QFileDialog::getOpenFileName(this,
@@ -685,7 +715,7 @@ void MainWindow::open()
 
            QTextStream in(&file);
            QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-           mr_Editor->setPlainText(in.readAll());
+           mainEditor->setPlainText(in.readAll());
            QGuiApplication::restoreOverrideCursor();
     }
 
@@ -697,7 +727,7 @@ void MainWindow::open()
 void MainWindow::updateStatusBar()
 {
     statusBar()->removeWidget(status);
-    status = new mr_statusBar{this, mr_Editor};
+    status = new statusBarFooter{this, mainEditor};
     statusBar()->addWidget(status);
 }
 
@@ -716,20 +746,23 @@ void MainWindow::applyCheckedTheme()
 void MainWindow::setKeywordsCXX2020()
 {
     delete highlighter;
-    highlighter = new Highlighter(this->mr_Editor->document(), syntaxColor, commentColor, literalColor, functionColor, Highlighter::CXX20);
+    highlighter = new Highlighter(this->mainEditor->document(), syntaxColor, commentColor, literalColor, functionColor, Highlighter::CXX20);
 }
+
 
 void MainWindow::setKeywordsCXX2011()
 {
     delete highlighter;
-    highlighter = new Highlighter(this->mr_Editor->document(), syntaxColor, commentColor, literalColor, functionColor, Highlighter::CXX11);
+    highlighter = new Highlighter(this->mainEditor->document(), syntaxColor, commentColor, literalColor, functionColor, Highlighter::CXX11);
 }
+
 
 void MainWindow::setKeywordsC2018()
 {
     delete highlighter;
-    highlighter = new Highlighter(this->mr_Editor->document(), syntaxColor, commentColor, literalColor, functionColor, Highlighter::C2018);
+    highlighter = new Highlighter(this->mainEditor->document(), syntaxColor, commentColor, literalColor, functionColor, Highlighter::C2018);
 }
+
 
 void MainWindow::openNewTheme()
 {
@@ -739,6 +772,8 @@ void MainWindow::openNewTheme()
     setThemeSettings(newThemePath);
 
 }
+
+
 bool MainWindow::save()
 {
     QString fileName = currentFilePath;
@@ -753,7 +788,7 @@ bool MainWindow::save()
             if (file.open(QFile::WriteOnly | QFile::Text))
             {
                 QTextStream out(&file);
-                out << mr_Editor->toPlainText();
+                out << mainEditor->toPlainText();
                 if (!file.commit())
                 {
                     errorMessage = tr("Cannot write file %1:\n%2.").arg(QDir::toNativeSeparators(fileName), file.errorString());
@@ -779,6 +814,7 @@ bool MainWindow::save()
     setWindowModified(false);
     return true;
 }
+
 
 bool MainWindow::saveAs()
 {
@@ -798,7 +834,7 @@ bool MainWindow::saveAs()
             if (file.open(QFile::WriteOnly | QFile::Text))
             {
                 QTextStream out(&file);
-                out << mr_Editor->toPlainText();
+                out << mainEditor->toPlainText();
                 if (!file.commit())
                 {
                     errorMessage = tr("Cannot write file %1:\n%2.").arg(QDir::toNativeSeparators(fileName), file.errorString());
@@ -825,13 +861,13 @@ bool MainWindow::saveAs()
     return true;
 }
 
+
 void MainWindow::setBackgroungColor()
 {
-    mr_Editor->backgroundColor = colorPicker->getColor();
-    backgroundColor = mr_Editor->backgroundColor;
-    mr_Editor->updateBackgroundColor();
+    mainEditor->backgroundColor = colorPicker->getColor();
+    backgroundColor = mainEditor->backgroundColor;
+    mainEditor->updateBackgroundColor();
 }
-
 
 
 void MainWindow::exit()
@@ -844,7 +880,7 @@ void MainWindow::exit()
 void MainWindow::documentWasModified()
 
 {
-    setWindowModified(mr_Editor->document()->isModified());
+    setWindowModified(mainEditor->document()->isModified());
 }
 
 
@@ -852,7 +888,7 @@ void MainWindow::setCurrentFileName(const QString &fileName)
 
 {
     currentFileName = fileName;
-    mr_Editor->document()->setModified(false);
+    mainEditor->document()->setModified(false);
     setWindowModified(false);
 
     QString shownName = currentFileName;

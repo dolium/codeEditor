@@ -153,36 +153,36 @@ void MainWindow::createMenu()
    QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
    const QIcon cutIcon = QIcon::fromTheme("edit-cut", QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/cut.png"));
    QAction *cutAct = new QAction(cutIcon, tr("Cu&t"), this);
-   connect(cutAct, &QAction::triggered, mr_Editor, &QPlainTextEdit::cut);
+   connect(cutAct, &QAction::triggered, mainEditor, &QPlainTextEdit::cut);
    editMenu->addAction(cutAct);
 
    const QIcon copyIcon =  QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/copyIcon.png");
    QAction *copyAct = new QAction(copyIcon, tr("&Copy"), this);
-   connect(copyAct, &QAction::triggered, mr_Editor, &QPlainTextEdit::copy);
+   connect(copyAct, &QAction::triggered, mainEditor, &QPlainTextEdit::copy);
    editMenu->addAction(copyAct);
 
    const QIcon pasteIcon = QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/pasteIcon.png");
    QAction *pasteAct = new QAction(pasteIcon, tr("&Paste"), this);
-   connect(pasteAct, &QAction::triggered, mr_Editor, &QPlainTextEdit::paste);
+   connect(pasteAct, &QAction::triggered, mainEditor, &QPlainTextEdit::paste);
    editMenu->addAction(pasteAct);
 
    const QIcon undoIcon = QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/undoIcon.png");
    QAction *undoAct = new QAction(pasteIcon, tr("&Undo"), this);
-   connect(undoAct, &QAction::triggered, mr_Editor, &QPlainTextEdit::undo);
+   connect(undoAct, &QAction::triggered, mainEditor, &QPlainTextEdit::undo);
    editMenu->addAction(undoAct);
 
    const QIcon reIcon = QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/redoIcon.png");
    QAction *reAct = new QAction(reIcon, tr("&Repeat"), this);
-   connect(reAct, &QAction::triggered, mr_Editor, &QPlainTextEdit::redo);
+   connect(reAct, &QAction::triggered, mainEditor, &QPlainTextEdit::redo);
    editMenu->addAction(reAct);
 
    const QIcon findIcon =  QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/findIcon.png");
    QAction *findAct = new QAction(findIcon, tr("&Find"), this);
    findAct->setStatusTip(tr("Find"));
 
-   mr_Editor->findDialog = new FindDialog(this, FindDialog::mode::FIND);
-   connect(findAct, &QAction::triggered, mr_Editor, &Editor::showFindDialog);
-   connect(mr_Editor->findDialog->findButton, &QPushButton::clicked, mr_Editor, &Editor::findAndHighlight);
+   mainEditor->findDialog = new FindDialog(this, FindDialog::mode::FIND);
+   connect(findAct, &QAction::triggered, mainEditor, &Editor::showFindDialog);
+   connect(mainEditor->findDialog->findButton, &QPushButton::clicked, mainEditor, &Editor::findAndHighlight);
 
    editMenu->addAction(findAct);
    fileToolBar->addAction(findAct);
@@ -190,17 +190,17 @@ void MainWindow::createMenu()
    QAction *findReplaceAct = new QAction(findReplaceIcon, tr("&Find and replace"), this);
    findReplaceAct->setStatusTip("find and Replace");
 
-   mr_Editor->replaceDialog = new FindDialog(this, FindDialog::mode::FIND_AND_REPLACE);
-   connect(findReplaceAct, &QAction::triggered, mr_Editor, &Editor::showReplaceDialog);
-   connect(mr_Editor->replaceDialog->replaceButton, &QPushButton::clicked, mr_Editor, &Editor::replace);
-   connect(mr_Editor->replaceDialog->replaceAllButton, &QPushButton::clicked, mr_Editor, &Editor::replaceAll);
-   connect(mr_Editor->replaceDialog->findButton, &QPushButton::clicked, mr_Editor, &Editor::findAndHighlightForFindInFindAndReplace);
+   mainEditor->replaceDialog = new FindDialog(this, FindDialog::mode::FIND_AND_REPLACE);
+   connect(findReplaceAct, &QAction::triggered, mainEditor, &Editor::showReplaceDialog);
+   connect(mainEditor->replaceDialog->replaceButton, &QPushButton::clicked, mainEditor, &Editor::replace);
+   connect(mainEditor->replaceDialog->replaceAllButton, &QPushButton::clicked, mainEditor, &Editor::replaceAll);
+   connect(mainEditor->replaceDialog->findButton, &QPushButton::clicked, mainEditor, &Editor::findAndHighlightForFindInFindAndReplace);
    editMenu->addAction(findReplaceAct);
    fileToolBar->addAction(findReplaceAct);
 
 
    QAction *selectAllAct = new QAction(findIcon, tr("&Select All"), this);
-   connect(selectAllAct, &QAction::triggered, mr_Editor, &Editor::selectAll);
+   connect(selectAllAct, &QAction::triggered, mainEditor, &Editor::selectAll);
    editMenu->addAction(selectAllAct);
 
 

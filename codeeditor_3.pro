@@ -15,19 +15,19 @@ SOURCES += \
     keywords.cpp \
     main.cpp \
     mainwindow.cpp \
+    statusbar.cpp \
     stylecreatordialog.cpp \
     styleswitchdialog.cpp\
-    createmenu.cpp\
-    mr_statusbar.cpp
+    createmenu.cpp
 
 HEADERS += \
     aboutdialog.h \
     findDialog.h \
     highlighter.h \
     mainwindow.h \
+    statusbar.h \
     stylecreatordialog.h \
-    styleswitchdialog.h\
-    mr_statusbar.h
+    styleswitchdialog.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

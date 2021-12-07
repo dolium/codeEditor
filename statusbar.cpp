@@ -1,6 +1,6 @@
-#include "mr_statusbar.h"
+#include "statusbar.h"
 
-mr_statusBar::mr_statusBar(QMainWindow *parent, QPlainTextEdit* edit) : QWidget(parent)
+statusBarFooter::statusBarFooter(QMainWindow *parent, QPlainTextEdit* edit) : QWidget(parent)
 {
     wordsCount = 0;
     characterCount = 0;
@@ -32,7 +32,7 @@ mr_statusBar::mr_statusBar(QMainWindow *parent, QPlainTextEdit* edit) : QWidget(
 }
 
 
-void mr_statusBar::updateCountInfo()
+void statusBarFooter::updateCountInfo()
 {
 
     auto wordsAndTrash = edit->document()->toPlainText().split(QRegularExpression("\\s+"));
@@ -47,7 +47,7 @@ void mr_statusBar::updateCountInfo()
 }
 
 
-void mr_statusBar::addAllWidgets()
+void statusBarFooter::addAllWidgets()
 {
     layout->addWidget(rowColumnLabel);
     layout->addWidget(lastModificationTime);
@@ -56,7 +56,7 @@ void mr_statusBar::addAllWidgets()
 }
 
 
-void mr_statusBar::removeAllWidgets()
+void statusBarFooter::removeAllWidgets()
 {
     layout->removeWidget(rowColumnLabel);
     layout->removeWidget(lastModificationTime);
@@ -65,7 +65,7 @@ void mr_statusBar::removeAllWidgets()
 }
 
 
-void mr_statusBar::updateSizeInfo(QString path)
+void statusBarFooter::updateSizeInfo(QString path)
 {
     QFileInfo fileInfo{path};
     fileSize = fileInfo.size();
@@ -78,7 +78,7 @@ void mr_statusBar::updateSizeInfo(QString path)
 }
 
 
-void mr_statusBar::updateRowColumn()
+void statusBarFooter::updateRowColumn()
 {
     rowColumnPosition = "Row/column position: "+QString::number(edit->textCursor().blockNumber())+" | " + QString::number(edit->textCursor().positionInBlock());
     removeAllWidgets();
@@ -88,7 +88,7 @@ void mr_statusBar::updateRowColumn()
 }
 
 
-void mr_statusBar::updateModificationTime()
+void statusBarFooter::updateModificationTime()
 {
     removeAllWidgets();
     delete lastModificationTime;

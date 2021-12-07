@@ -141,6 +141,7 @@ void StyleSwitchDialog::updateTextColor()
     smallEditor->setPalette(palette);
 }
 
+
 void StyleSwitchDialog::showPossibleChanges()
 {
     updateTheme();
@@ -173,6 +174,7 @@ void StyleSwitchDialog::addThemesToDelete()
         }
     }
 }
+
 
 void StyleSwitchDialog::pickSyntaxColor()
 {
@@ -208,11 +210,13 @@ void StyleSwitchDialog::pickBackgroundColor()
     showPossibleChanges();
 }
 
+
 void StyleSwitchDialog::pickTextColor()
 {
     textColor = colorDialog->getColor();
     showPossibleChanges();
 }
+
 
 void StyleSwitchDialog::reformTheme()
 {

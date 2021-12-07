@@ -32,7 +32,7 @@
 #include <QActionGroup>
 #include <QFontDialog>
 #include <QFont>
-#include "mr_statusbar.h"
+#include "statusbar.h"
 #include "aboutdialog.h"
 #include <QMap>
 #include <QDirIterator>
@@ -114,10 +114,10 @@ class MainWindow:public QMainWindow
 public:
     MainWindow();
 private:
-    Editor* mr_Editor;
+    Editor* mainEditor;
     QToolBar *fileToolBar;
     Highlighter *highlighter;
-    mr_statusBar *status;
+    statusBarFooter *status;
 
     StyleCreatorDialog *styleDialog;
     StyleSwitchDialog *styleSwitchDialog;
