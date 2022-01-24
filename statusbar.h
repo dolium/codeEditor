@@ -15,7 +15,6 @@ class statusBarFooter : public QWidget
 {
     Q_OBJECT
 public:
-    statusBarFooter(QMainWindow *parent, QPlainTextEdit* edit);
     QLabel *rowColumnLabel;
     QLabel *lastModificationTime;
     int wordsCharacterCount;
@@ -30,12 +29,15 @@ public:
     int wordsCount;
     int characterCount;
 
-
+public:
+    statusBarFooter(QMainWindow *parent, QPlainTextEdit* edit);
     void updateSizeInfo(QString path);
 public slots:
     void updateRowColumn();
     void updateModificationTime();
     void updateCountInfo();
+ signals:
+    void wordCountChanged(int wordCount);
 private:
     void addAllWidgets();
     void removeAllWidgets();

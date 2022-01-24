@@ -18,8 +18,8 @@ public:
     StyleSwitchDialog(QWidget* parent, QVector<QString> pathAndNames);
 
 
-    QString getPath()const{return currentPath;}
-    QString getName()const{return currentName;}
+    QString          getPath()const{return currentPath;}
+    QString          getName()const{return currentName;}
     QVector<QString> getStyleNames()const {return names;}
     QVector<QString> getStylePaths()const{return paths;}
     QVector<QString> getDeleteThemes()const{return themesToDelete;}
@@ -77,3 +77,10 @@ public slots:
     void reformTheme();
 };
 #endif
+
+
+
+
+
+
+

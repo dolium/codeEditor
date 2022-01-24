@@ -28,26 +28,31 @@ public:
     QString getStyleName(){return name;}
 private:
     QGroupBox *gridGroupBox;
+    QColorDialog *colorDialog;
     QTextEdit *smallEditor;
     QVector<QLabel*> labels;
     QVector<QPushButton *>pickButton;
     QPushButton *acceptButton;
-    void createGridGroupBox();
-    void showPossibleChanges();
-    void updateTheme();
-    void updateTextColor();
-    void updateBackgroundColor();
     QLabel* justLabel;
     QLineEdit *styleNameEdit;
     Highlighter* highlighter;
+
     QColor syntaxColor = Qt::magenta;
     QColor commentColor = Qt::darkCyan;
     QColor literalColor = Qt::blue;
     QColor functionColor = Qt::darkRed;
     QColor backgroundColor = Qt::gray;
     QColor textColor = Qt::black;
+
     QString name = "unnamed";
-    QColorDialog *colorDialog;
+
+
+private:
+    void createGridGroupBox();
+    void showPossibleChanges();
+    void updateTheme();
+    void updateTextColor();
+    void updateBackgroundColor();
 
 public slots:
 

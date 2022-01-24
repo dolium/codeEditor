@@ -1,7 +1,7 @@
 ﻿#include "mainwindow.h"
 #include "highlighter.h"
-
-
+#include <QAbstractItemView>
+#include <QScrollBar>
 
 MainWindow::MainWindow()
 {
@@ -43,7 +43,9 @@ MainWindow::MainWindow()
     statusBar()->addWidget(status);
     connect(mainEditor, &QPlainTextEdit::cursorPositionChanged, status, &statusBarFooter::updateRowColumn);
     connect(mainEditor, &QPlainTextEdit::cursorPositionChanged, status, &statusBarFooter::updateCountInfo);
-
+    //Completer:
+    mainEditor->refreshCompleter();
+    connect(status, &statusBarFooter::wordCountChanged, mainEditor, &Editor::refreshCompleter);
 }
 
 
@@ -344,8 +346,71 @@ Editor::Editor(QWidget *parent) : QPlainTextEdit(parent)
 
 
 
-}
 
+}
+void Editor::keyPressEvent(QKeyEvent *e)
+{
+    if (completer && completer->popup()->isVisible()) {
+        // The following keys are forwarded by the completer to the widget
+       switch (e->key()) {
+       case Qt::Key_Enter:
+       case Qt::Key_Return:
+       case Qt::Key_Escape:
+       case Qt::Key_Tab:
+       case Qt::Key_Backtab:
+            e->ignore();
+            return; // let the completer do default behavior
+       default:
+           break;
+       }
+    }
+
+    const bool isShortcut = (e->modifiers().testFlag(Qt::ControlModifier) && e->key() == Qt::Key_E); // CTRL+E
+    if (!completer || !isShortcut) // do not process the shortcut when we have a completer
+        QPlainTextEdit::keyPressEvent(e);
+
+    const bool ctrlOrShift = e->modifiers().testFlag(Qt::ControlModifier) ||
+                             e->modifiers().testFlag(Qt::ShiftModifier);
+    if (!completer || (ctrlOrShift && e->text().isEmpty()))
+        return;
+
+    static QString eow("~!@#$%^&*()_+{}|:\"<>?,./;'[]\\-="); // end of word
+    const bool hasModifier = (e->modifiers() != Qt::NoModifier) && !ctrlOrShift;
+    QString completionPrefix = textUnderCursor();
+
+    if (!isShortcut && (hasModifier || e->text().isEmpty()|| completionPrefix.length() < 3
+                      || eow.contains(e->text().right(1)))) {
+        completer->popup()->hide();
+        return;
+    }
+
+    if (completionPrefix != completer->completionPrefix()) {
+        completer->setCompletionPrefix(completionPrefix);
+        completer->popup()->setCurrentIndex(completer->completionModel()->index(0, 0));
+    }
+    QRect cr = cursorRect();
+    cr.setWidth(completer->popup()->sizeHintForColumn(0)
+                + completer->popup()->verticalScrollBar()->sizeHint().width());
+    completer->complete(cr); // popup it up!
+}
+QString Editor::textUnderCursor() const
+{
+    QTextCursor tc = textCursor();
+    tc.select(QTextCursor::WordUnderCursor);
+    return tc.selectedText();
+}
+void Editor::insertCompletion(const QString &completion)
+{
+    if (completer->widget() != this)
+        return;
+    QTextCursor tc = textCursor();
+    int extra = completion.length() - completer->completionPrefix().length();
+    tc.movePosition(QTextCursor::Left);
+    tc.movePosition(QTextCursor::EndOfWord);
+    tc.insertText(completion.right(extra));
+    setTextCursor(tc);
+    qDebug()<<"Works wtf...";
+}
 
 void MainWindow::enableNumBar()
 {
@@ -374,12 +439,12 @@ void MainWindow::enableHighlighting()
 {
     if (!hideHighlightingAct->isChecked())
     {
-        highlighter->enabled = false;
+        highlighter->isEnabled = false;
         mainEditor->setPlainText(mainEditor->document()->toPlainText());
     }
     else
     {
-        highlighter->enabled = true;
+        highlighter->isEnabled = true;
         mainEditor->setPlainText(mainEditor->document()->toPlainText());
     }
 }
@@ -458,6 +523,64 @@ void Editor::findAndHighlightForFindInFindAndReplace()
     }
 }
 
+void Editor::refreshCompleter()
+{
+    QStringList wordList;
+    QMap<QString, QStringList> wordCompleteDict;
+    wordCompleteDict["countVariablesNames"];
+    wordCompleteDict["countVariablesTypes"];
+    wordCompleteDict["countVariables"];
+    wordCompleteDict["cycles"];
+    wordCompleteDict["debugStack"];
+    QRegularExpression containerNameExp{"(?:(?:(?:QVector|QList|QQueue|QStack|std::vector|std::list)<[A-Za-z]+>)|QStringList)\\s*\\K[A-Za-z]+[A-Za-z0-9]*\\b(?!\\(\\))"};
+    QRegularExpressionMatchIterator containerNames= containerNameExp.globalMatch(this->document()->toPlainText());
+    while(containerNames.hasNext())
+    {
+      wordCompleteDict["containerNames"]<<containerNames.next().captured(0);
+    }
+    for (int i = wordCompleteDict["containerNames"].size()-1; i >=0; i-- )
+    {
+        QString& container = wordCompleteDict["containerNames"][i];
+        wordCompleteDict["cycles"]<<("for (int i = 0; i < "+container+".size(); ++i) \n {\n \n } ");
+
+    }
+    QRegularExpression countVariableExp{"((?:\\bint|short|size_t|long long|(?:long(?! long)))\\b)\\s+\\K[a-zA-Z]+[0-9]*\\b(?!\\(\\))"};
+    QRegularExpressionMatchIterator countVariableNames= countVariableExp.globalMatch(this->document()->toPlainText());
+    while(countVariableNames.hasNext())
+    {
+        auto tempCaptured = countVariableNames.next();
+        wordCompleteDict["countVariablesNames"]<<tempCaptured.captured(0);
+        wordCompleteDict["countVariablesTypes"]<<tempCaptured.captured(1);
+    }
+    for (int i = wordCompleteDict["countVariablesNames"].size()-1; i >=0; i--)
+    {
+        wordCompleteDict["cycles"]<<("for ("+wordCompleteDict["countVariablesTypes"][i]+" i = 0; i < "+wordCompleteDict["countVariablesNames"][i]+" ++i) \n {\n \n } ");
+    }
+    if(wordCompleteDict["countVariablesNames"].size()!=0)
+    {
+         wordCompleteDict["debugStack"]<<"qDebug()<<\"this is value of "+wordCompleteDict["countVariablesNames"].last()+": \" "+" <<"+wordCompleteDict["countVariablesNames"].last()+";";
+         wordCompleteDict["debugStack"]<<"std::cout<<\"this is value of "+wordCompleteDict["countVariablesNames"].last()+": \" "+" <<"+wordCompleteDict["countVariablesNames"].last()+";";
+    }
+    if(wordCompleteDict["containerNames"].size()!=0)
+    {
+        wordCompleteDict["debugStack"]<<"qDebug()<<\"this is value of "+wordCompleteDict["containerNames"].last()+": \" "+"<<"+wordCompleteDict["containerNames"].last()+";";
+        wordCompleteDict["debugStack"]<<"std::cout<<\"this is value of "+wordCompleteDict["containerNames"].last()+": \" "+"<<"+wordCompleteDict["containerNames"].last()+";";
+    }
+    for (auto key:wordCompleteDict.keys())
+    {
+        if (key!="countVariablesTypes")
+        {
+            wordCompleteDict["allWords"]<<wordCompleteDict[key];
+        }
+    }
+    completer = new QCompleter(wordCompleteDict["allWords"], this);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);
+    completer->setCompletionMode(QCompleter::PopupCompletion);
+    completer->setWidget(this);
+    QObject::connect(completer, QOverload<const QString &>::of(&QCompleter::activated),
+                         this, &Editor::insertCompletion);
+
+}
 
 void Editor::showFindDialog()
 {
@@ -573,7 +696,7 @@ void MainWindow::enableToolBar()
 {
     if (hideToolBar->isChecked())
     {
-        fileToolBar->setVisible(true);
+        mainToolBar->setVisible(true);
         currentSettings->setValue("toolBarEnabled", QVariant(true));
         currentSettings->sync();
 
@@ -581,7 +704,7 @@ void MainWindow::enableToolBar()
 
     else
     {
-        fileToolBar->setVisible(false);
+        mainToolBar->setVisible(false);
         currentSettings->setValue("toolBarEnabled", QVariant(false));
         currentSettings->sync();
 
@@ -722,6 +845,9 @@ void MainWindow::open()
     status->updateModificationTime();
     status->updateSizeInfo(currentFilePath);
     setWindowModified(false);
+    mainEditor->refreshCompleter();
+
+
 }
 
 void MainWindow::updateStatusBar()
@@ -904,7 +1030,6 @@ void Editor::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu *menu = createStandardContextMenu();
 
-
     QAction *selectLineAct = new QAction(tr("&Select line"), this);
     connect(selectLineAct, &QAction::triggered, this, &Editor::selectLine);
     menu->addAction(selectLineAct);
@@ -915,3 +1040,4 @@ void Editor::contextMenuEvent(QContextMenuEvent *event)
 
     menu->exec(event->globalPos());
 }
+

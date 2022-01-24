@@ -3,14 +3,14 @@ void MainWindow::createMenu()
 {
 
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
-    fileToolBar = addToolBar(tr("File"));
+    mainToolBar = addToolBar(tr("File"));
     const QIcon newIcon = QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/newIcon.png");
     QAction *newAct = new QAction(newIcon, tr("&New"), this);
     newAct->setShortcuts(QKeySequence::New);
     newAct->setStatusTip(tr("Create a new file"));
     connect(newAct, &QAction::triggered, this, &MainWindow::newFile);
     fileMenu->addAction(newAct);
-    fileToolBar->addAction(newAct);
+    mainToolBar->addAction(newAct);
 
 
     const QIcon openIcon = QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/openIcon.png");
@@ -19,7 +19,7 @@ void MainWindow::createMenu()
     openAct->setStatusTip(tr("Open an existing file"));
     connect(openAct, &QAction::triggered, this, &MainWindow::open);
     fileMenu->addAction(openAct);
-    fileToolBar->addAction(openAct);
+    mainToolBar->addAction(openAct);
 
 
     const QIcon saveIcon =  QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/saveIcon.png");
@@ -28,7 +28,7 @@ void MainWindow::createMenu()
     saveAct->setStatusTip(tr("Save the document to disk"));
     connect(saveAct, &QAction::triggered, this, &MainWindow::save);
     fileMenu->addAction(saveAct);
-    fileToolBar->addAction(saveAct);
+    mainToolBar->addAction(saveAct);
 
     const QIcon saveAsIcon = QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/saveAsIcon.png");
     QAction *saveAsAct = fileMenu->addAction(saveAsIcon, tr("Save &As..."), this, &MainWindow::saveAs);
@@ -40,7 +40,7 @@ void MainWindow::createMenu()
     connect(exit, &QAction::triggered, this, &MainWindow::exit);
     exit->setStatusTip(tr("Quit the programm"));
     fileMenu->addAction(exit);
-    fileToolBar->addAction(exit);
+    mainToolBar->addAction(exit);
 
     QMenu *viewMenu = menuBar()->addMenu(tr("&View"));
     viewMenu->addAction(tr("&Set background color"), this, &MainWindow::setBackgroungColor);
@@ -167,7 +167,7 @@ void MainWindow::createMenu()
    editMenu->addAction(pasteAct);
 
    const QIcon undoIcon = QIcon("C:/Users/ivbon/OneDrive/Documents/Programming/codeeditor_3/imgs/undoIcon.png");
-   QAction *undoAct = new QAction(pasteIcon, tr("&Undo"), this);
+   QAction *undoAct = new QAction(undoIcon, tr("&Undo"), this);
    connect(undoAct, &QAction::triggered, mainEditor, &QPlainTextEdit::undo);
    editMenu->addAction(undoAct);
 
@@ -185,7 +185,7 @@ void MainWindow::createMenu()
    connect(mainEditor->findDialog->findButton, &QPushButton::clicked, mainEditor, &Editor::findAndHighlight);
 
    editMenu->addAction(findAct);
-   fileToolBar->addAction(findAct);
+   mainToolBar->addAction(findAct);
    const QIcon findReplaceIcon = QIcon("C:\\Users\\ivbon\\OneDrive\\Documents\\Programming\\codeeditor_3\\imgs\\findReplaceIcon.png");
    QAction *findReplaceAct = new QAction(findReplaceIcon, tr("&Find and replace"), this);
    findReplaceAct->setStatusTip("find and Replace");
@@ -196,7 +196,7 @@ void MainWindow::createMenu()
    connect(mainEditor->replaceDialog->replaceAllButton, &QPushButton::clicked, mainEditor, &Editor::replaceAll);
    connect(mainEditor->replaceDialog->findButton, &QPushButton::clicked, mainEditor, &Editor::findAndHighlightForFindInFindAndReplace);
    editMenu->addAction(findReplaceAct);
-   fileToolBar->addAction(findReplaceAct);
+   mainToolBar->addAction(findReplaceAct);
 
 
    QAction *selectAllAct = new QAction(findIcon, tr("&Select All"), this);

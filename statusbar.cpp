@@ -36,6 +36,8 @@ void statusBarFooter::updateCountInfo()
 {
 
     auto wordsAndTrash = edit->document()->toPlainText().split(QRegularExpression("\\s+"));
+    if (wordsCount!=wordsAndTrash.length()-1)
+        emit wordCountChanged(wordsCount);
     wordsCount = wordsAndTrash.length()-1;
     characterCount = edit->document()->characterCount();
     linesCount = edit->document()->blockCount();

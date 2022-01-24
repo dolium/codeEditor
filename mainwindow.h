@@ -42,11 +42,8 @@
 class Editor : public QPlainTextEdit
 {
     Q_OBJECT
-public:
-    Editor(QWidget *parent = nullptr);
-    void lineNumberAreaPaintEvent(QPaintEvent *event);
-private:
-    void contextMenuEvent(QContextMenuEvent *event) override;
+
+private:    
     QTextOption::WrapMode currentWrapMode;
 
     QWidget *lineNumberArea;
@@ -65,16 +62,28 @@ private:
 
     int countFind;
 
+    QCompleter *completer;
+
+public:
+    Editor(QWidget *parent = nullptr);
+    void lineNumberAreaPaintEvent(QPaintEvent *event);
+    void keyPressEvent(QKeyEvent *e) override;
+    QString textUnderCursor() const;
+
+private:
+    void contextMenuEvent(QContextMenuEvent *event) override;
     void updateBackgroundColor();
     void updateTextColor();
     void setTextColor(QColor color);
     void findAndHighlight();
     void findAndHighlightR();
     void findAndHighlightForFindInFindAndReplace();
+
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
 public slots:
+    void refreshCompleter();
     void updateLineNumberAreaWidth(int newBlockCount);
     void highlightCurrentLine();
     void updateLineNumberArea(const QRect &rect, int dy);
@@ -84,6 +93,7 @@ public slots:
     void showReplaceDialog();
     void selectLine();
     void selectWord();
+    void insertCompletion(const QString &completion);
     friend class MainWindow;
 };
 
@@ -115,7 +125,7 @@ public:
     MainWindow();
 private:
     Editor* mainEditor;
-    QToolBar *fileToolBar;
+    QToolBar *mainToolBar;
     Highlighter *highlighter;
     statusBarFooter *status;
 
@@ -202,3 +212,5 @@ public slots:
 //![extraarea]
 
 #endif
+
+

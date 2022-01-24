@@ -15,34 +15,38 @@ class QPushButton;
 QT_END_NAMESPACE
 
 
-
 class FindDialog : public QDialog
 {
     Q_OBJECT
 
 public:
     enum mode{FIND, FIND_AND_REPLACE};
-    FindDialog(QWidget *parent, mode currentMode);
     mode currentMode;
-
-    QString getFindText()const;
-    QString getReplaceText()const;
 
     QPushButton *findButton;
     QPushButton *replaceButton;
     QPushButton *replaceAllButton;
 
+private:
+    QString findText;
+    QString textToReplace;
+    QLabel *findLabel;
+
+    QLineEdit *lineEdit;
+    QLineEdit *replaceLineEdit;
+
+public:
+    FindDialog(QWidget *parent, mode currentMode);
+    QString getFindText()const;
+    QString getReplaceText()const;
     void findAndHighlight(QString text);
+
+private:
+    void createFindMenu();
+    void createReplaceMenu();
+
 public slots:
     void setFindText();
     void setReplaceText();
-private:
-    QString findText;
-    void createFindMenu();
-    void createReplaceMenu();
-    QString textToReplace;
-    QLabel *findLabel;
-    QLineEdit *lineEdit;
-    QLineEdit *replaceLineEdit;
 };
 #endif

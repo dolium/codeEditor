@@ -1,10 +1,9 @@
 #include "highlighter.h"
 
-
 Highlighter::Highlighter(QTextDocument *parent, QColor syntaxColor, QColor commentColor, QColor literalColor, QColor functionColor, keywordsSyntax syntaxType)
     : QSyntaxHighlighter(parent)
 {
-    enabled = true;
+    isEnabled = true;
     this->syntaxColor = syntaxColor;
     HighlightingRule rule;
 
@@ -42,9 +41,10 @@ Highlighter::Highlighter(QTextDocument *parent, QColor syntaxColor, QColor comme
     rule.format = functionFormat;
     highlightingRules.append(rule);
 
-
     commentStartExpression = QRegularExpression(QStringLiteral("/\\*"));
     commentEndExpression = QRegularExpression(QStringLiteral("\\*/"));
+
+
 }
 
 void Highlighter::setSyntaxColor(QColor newColor)
@@ -56,13 +56,14 @@ void Highlighter::setSyntaxColor(QColor newColor)
 
 void Highlighter::highlightBlock(const QString &text)
 {
-    if(enabled == false){return;}
+    if(isEnabled == false){return;}
     for (const HighlightingRule &rule : highlightingRules)
     {
         QRegularExpressionMatchIterator matchIterator = rule.pattern.globalMatch(text);
         while (matchIterator.hasNext())
         {
             QRegularExpressionMatch match = matchIterator.next();
+
             setFormat(match.capturedStart(), match.capturedLength(), rule.format);
         }
     }
